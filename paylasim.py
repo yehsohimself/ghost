@@ -875,11 +875,20 @@ def _gelisim_blogu(yer):
         return ""
 
 
+def _strateji_blogu():
+    """Danışman görüşmesinden çıkan iletişim stratejisi (ghost_danisman.py); yapılmadıysa ''."""
+    try:
+        import ghost_danisman
+        return ghost_danisman.strateji_blogu()
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 def _ses_blogu(pr, konu="", is_turu=None, platform="x"):
     dersler = [d for d in pr.get("duzeltme_dersleri") or [] if isinstance(d, str)]
     # 2026-10-26 (kişinin rehberi, 13. bölüm): okur verisi ve tek örnekten çıkan ders hipotezdir; ilkelerle çelişirse ilke önce gelir
     return (f"KİM: {pr.get('kimlik') or '-'}\nYAZIM TARZI (geçmiş gönderilerinin tarifi; kural değil, ilkelerle çelişirse ilke önce gelir): {pr['tarz']}\n"
-            f"{_persona_blogu(pr, konu=konu, is_turu=is_turu, platform=platform)}\n"
+            f"{_persona_blogu(pr, konu=konu, is_turu=is_turu, platform=platform)}\n{_strateji_blogu()}"
             + ("KİŞİNİN TASLAKLARDA YAPTIĞI DÜZELTMELERDEN ÖĞRENİLENLER (bunlara mutlaka uy):\n" + "\n".join(f"- {d}" for d in dersler) + "\n" if dersler else "")
             + ("BU KONUYA YAKIN DÜZELTMELERİNDEN ÇIKAN TERCİHLERİ (kapsamı uyuyorsa uy; başka tür metne zorla taşıma; 'beklenmedik/taze' tercihi kaynağın "
                "desteklemediği şaşırtıcı yorum izni değil):\n"

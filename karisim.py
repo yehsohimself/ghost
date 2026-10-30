@@ -278,7 +278,7 @@ def _yaz(M, dagilim, pr, bugun_yazilanlar, ek="", hedef=12):
     toplam = round(hedef * 1.8)                    # hakem eleyecek (ilk denemede 15'ten 5'i geçti); bol yaz
     return paylasim._claude_json(
         f"Bugün {time.strftime('%d.%m.%Y %A')}. Bir kişinin X hesabı için bugünün gönderilerini onun ağzından yazıyorsun. Toplam {toplam} gönderi.\n\n"
-        f"KİM: {pr.get('kimlik', '')}\nTAVIR: {pr.get('tavir', '')}\n{paylasim._persona_blogu(pr, kisa=True)}\n"
+        f"KİM: {pr.get('kimlik', '')}\nTAVIR: {pr.get('tavir', '')}\n{paylasim._persona_blogu(pr, kisa=True)}\n{paylasim._strateji_blogu()}"
         + ("DÜZELTMELERİNDEN ÖĞRENİLENLER:\n" + "\n".join(f"- {t.get('tercih')}" for t in paylasim.tercihler() if isinstance(t, dict) and t.get("aktif", True) and t.get("tercih"))[:1800] + "\n")
         + ("KONUSU İYİ AMA SÖYLENENİ BARİZ BULDUĞU TASLAKLAR (bu düzeyde gözlem yazma):\n" + "\n".join(f"- {r.get('ilk', '')[:200]}" for r in paylasim._red(pr, "aci")[-5:]) + "\n"
            if paylasim._red(pr, "aci") else "")

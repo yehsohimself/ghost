@@ -116,7 +116,7 @@ def kaynak_listesi():
 
 def derin_mi(m):
     """Madde derin bir yayından ya da kişinin kendi kürasyonundan mı (bülten, Kantan, dinlediği yayın, izlediği hesap, arşiv)?"""
-    return bool(m.get("kaynak") in DERIN or m.get("kaynak") in DERIN_EK or m.get("kesif_bulten") or m.get("kesif_kantan") or m.get("kesif_yayin") or m.get("x_hesap")
+    return bool(m.get("kaynak") in DERIN or m.get("kaynak") in DERIN_EK or m.get("kesif_bulten") or m.get("kesif_kantan") or m.get("kesif_yayin") or m.get("x_hesap") or m.get("kesif_secki")
                 or m.get("arsiv") or m.get("kesif_abonelik"))
 
 
@@ -316,13 +316,13 @@ def sec(maddeler, log=print, geri_bildirim=""):
     say = {}
     for m in adaylar:
         say[m["alan"]] = say.get(m["alan"], 0) + 1
-    adaylar = sorted(adaylar, key=lambda m: (0 if m.get("kesif_yayin") or m.get("kesif_bulten") or m.get("x_hesap") or m.get("kesif_kantan") else (1 if derin_mi(m) else 2),
+    adaylar = sorted(adaylar, key=lambda m: (0 if m.get("kesif_yayin") or m.get("kesif_bulten") or m.get("x_hesap") or m.get("kesif_kantan") or m.get("kesif_secki") else (1 if derin_mi(m) else 2),
                                              -m["zaman"]))   # kişinin kendi kürasyonu önce, sonra derin yayınlar, en son günlük haber akışları
     secilen, sinir = [], {}
     for m in adaylar:                        # alan başına en çok 22 aday (istem boyu)
         if sinir.get(m["alan"], 0) < 22:
             secilen.append(m); sinir[m["alan"]] = sinir.get(m["alan"], 0) + 1
-    satir = "\n".join(f"[{i}] ({m['alan']} · {m['kaynak']}{' · derin yayın' if m.get('kaynak') in DERIN else ''}{' · görselli' if m['resim'] else ''}{' · ' + str(m.get('kaynak_sayisi')) + ' kaynak yazıyor' if m.get('kaynak_sayisi', 1) > 1 else ''}{' · Google’da yükseliyor' if m.get('trend') else ''}{' · dinlediği yayında konuşuldu' if m.get('kesif_yayin') else ''}{' · üye olduğu bültende geçti' if m.get('kesif_bulten') else ''}{' · Kantan.News seçkisinde (' + m['kesif_kantan'] + '; kişinin beğendiği küratör)' if m.get('kesif_kantan') else ''}{' · Almanca kaynak (Türk okur bilmiyor; Berlin bakışı)' if m.get('kaynak') in ALMANCA else ''}{' · bugün geçmişte: ' + str(m['arsiv'].get('yil')) if m.get('arsiv') else ''}{' · izlediği hesap @' + m['x_hesap'] + ' paylaştı (alıntılanabilir)' if m.get('x_hesap') else ''}) "
+    satir = "\n".join(f"[{i}] ({m['alan']} · {m['kaynak']}{' · derin yayın' if m.get('kaynak') in DERIN else ''}{' · görselli' if m['resim'] else ''}{' · ' + str(m.get('kaynak_sayisi')) + ' kaynak yazıyor' if m.get('kaynak_sayisi', 1) > 1 else ''}{' · Google’da yükseliyor' if m.get('trend') else ''}{' · dinlediği yayında konuşuldu' if m.get('kesif_yayin') else ''}{' · üye olduğu bültende geçti' if m.get('kesif_bulten') else ''}{' · Kantan.News seçkisinde (' + m['kesif_kantan'] + '; kişinin beğendiği küratör)' if m.get('kesif_kantan') else ''}{' · kişinin ChatGPT okuma masasının günlük seçkisinde (kanıt sınırı verildi; bunun ötesini iddia etme)' if m.get('kesif_secki') else ''}{' · Almanca kaynak (Türk okur bilmiyor; Berlin bakışı)' if m.get('kaynak') in ALMANCA else ''}{' · bugün geçmişte: ' + str(m['arsiv'].get('yil')) if m.get('arsiv') else ''}{' · izlediği hesap @' + m['x_hesap'] + ' paylaştı (alıntılanabilir)' if m.get('x_hesap') else ''}) "
                       f"{m['baslik']} — {m['ozet'][:220]}" for i, m in enumerate(secilen))
     alanlar = "\n".join(f"- {a['kod']}: {a['ad']} (ağırlık {a.get('agirlik', 2)}): {a.get('not', '')[:260]}" for a in pr.get("alanlar") or [])
     c = paylasim._claude_json(
@@ -430,6 +430,7 @@ def aci_elemesi(adaylar, pr, log=print):
         "içerik paylaşan bir hesap olayım'; bir açı için: 'çok sıkıcı bir bakış açısı; söyleye söyleye bunu mu söyledin derler').\n\n"
         f"KİM: {pr.get('kimlik', '')}\nHEDEF PROFİL: {pr.get('hedef_profil', '')}\nALANLARI BAĞLAYAN BAKIŞ: {pr.get('baglanti', '')}\n"
         f"{paylasim._persona_blogu(pr, kisa=True)}\n{__import__('ghost_rehber').oneri_blogu()}\n"
+        f"{paylasim._strateji_blogu()}"
         + ("DÜZELTMELERİNDEN ÖĞRENİLEN TERCİHLER:\n" + "\n".join(f"- {t}" for t in tercihler) + "\n" if tercihler else "")
         + paylasim._gelisim_blogu("konu")
         + ("BEĞENMEDİĞİ ÖNERİ TURLARI:\n" + "\n".join(f"- {r.get('neden') or 'neden yok'}: {'; '.join(r.get('basliklar') or [])[:240]}" for r in red) + "\n" if red else "")
@@ -1098,6 +1099,10 @@ def calistir(log=print, yaz=True, geri_bildirim="", toplanti="", hemen=False):
             maddeler = maddeler + kantan.maddeler(log)
     except Exception as e:  # noqa: BLE001
         log(f"Kantan.News okunamadı: {e}")
+    try:                                                   # ChatGPT'nin günlük okuma seçkisi (seckiler.py; Drive'da ise). Kişinin kendi okuma masası: önce gelir
+        maddeler = maddeler + secki_maddeleri(log)
+    except Exception as e:  # noqa: BLE001
+        log(f"Günlük seçki okunamadı: {e}")
     try:                                                   # bugün geçmişte (Wikipedia), günde bir kez
         maddeler = maddeler + arsiv_maddeleri(log)
     except Exception as e:  # noqa: BLE001
@@ -1161,6 +1166,42 @@ def calistir(log=print, yaz=True, geri_bildirim="", toplanti="", hemen=False):
                 log(f"Konu toplantısı kurulamadı, doğrudan yazılıyor: {e}")
         yazim_turu(maddeler, xh, birlesik, log=log)
     return kayit
+
+
+def secki_maddeleri(log=print):
+    """ChatGPT'nin 'Günlük Okuma ve Yayın Seçkisi'ndeki konular keşfin maddesi olur (2026-10-30; kullanıcı: 'ChatGPT'nin DOT'unun getirileri ve seçkileri
+    dahil'). Yalnız kaynak bağlantısı olan konular (açı elemesi metni okur); alan, konu adı/kodundaki sözcüklerle tahmin edilir, yoksa en ağır alan.
+    Seçkinin 'kanıt sınırı' maddeye özetle birlikte gider. Drive bağlı değilse boş."""
+    try:
+        import seckiler
+        s = seckiler.son(2)
+    except Exception:  # noqa: BLE001
+        return []
+    if not s or not s.get("konular"):
+        return []
+    pr = __import__("paylasim").profil()
+    alanlar = [a for a in pr.get("alanlar") or [] if isinstance(a, dict) and a.get("kod")]
+    if not alanlar:
+        return []
+    varsayilan = max(alanlar, key=lambda a: a.get("agirlik") or 0)["kod"]
+    out = []
+    for k in s["konular"]:
+        link = next((u for u in k.get("kaynaklar") or [] if str(u).startswith("http")), "")
+        if not link or not k.get("baslik"):
+            continue
+        metin = (str(k.get("baslik")) + " " + str(k.get("metin") or "") + " " + str(k.get("neden") or "")).lower()
+        alan = varsayilan
+        for a in alanlar:
+            kelimeler = [w for w in re.findall(r"\w{5,}", (str(a.get("ad") or "") + " " + str(a.get("not") or "")).lower())][:14]
+            if any(w[:6] in metin for w in kelimeler):
+                alan = a["kod"]; break
+        ozet = (str(k.get("metin") or "")[:400] + (f" | Neden önemli: {k['neden']}" if k.get("neden") else "")
+                + (f" | Kanıt sınırı: {k['kanit_siniri']}" if k.get("kanit_siniri") else ""))[:900]
+        out.append({"alan": alan, "kaynak": "ChatGPT seçkisi", "baslik": str(k["baslik"])[:220], "ozet": ozet, "link": link, "resim": "",
+                    "zaman": time.time(), "kesif_secki": s.get("tarih") or "bugün", "kanit_siniri": str(k.get("kanit_siniri") or "")[:300]})
+    if out:
+        log(f"ChatGPT seçkisinden {len(out)} konu ({s.get('tarih')})")
+    return out
 
 
 def _ayar_acik(ad, varsayilan=True):

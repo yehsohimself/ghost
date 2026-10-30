@@ -41,6 +41,21 @@ way round:
    worth quoting, turning into your own post, or skipping, and gives you the finished text.
 4. **It adapts.** If you stop looking, it writes less. If you edit a lot, it learns the pattern and stops making the same mistake.
 
+## Your advisor
+
+Ghost also plays the role of a communication advisor. Before it writes anything for you, three experts (a strategist, an editor, an X expert)
+ask you eight short questions: what the account is for, who you write for, what sets your view apart, how often and when you post, how
+sharp you want to be. Your answers shape every topic and every draft from then on. Then, in the **Advisor** tab:
+
+- **Where your account stands:** six scores measured from your real data, not guessed: rhythm, range of topics, depth (sourced and
+  grounded in your own views), voice (how much you had to rewrite), reader response (saves and shares per thousand views) and consistency
+  with the opinions you hold. Each one says what the number is based on, what is missing and the one thing to do about it. When there is
+  not enough data, it says so instead of inventing a score.
+- **This week:** a short note from your advisor every Monday (what the account really needs this week, three gaps with one action each, a
+  day-by-day plan of what to post, why, and where) and one thing not to do.
+- **Coming up:** dated events in your topics over the next three weeks (award shortlists, launches, conferences, finals, anniversaries),
+  found by searching the web. Ghost reminds you a few days before and "Prepare" turns an event into a draft idea written in your voice.
+
 ## What's inside
 
 - **Daily drafts for X** in several shapes: a one-liner, an observation, a longer take, a thread. A balanced mix across your topics.
