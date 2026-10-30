@@ -1,0 +1,36 @@
+.venv*/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+*.log.*
+# your own data stays on your Mac
+ayarlar.json
+profil/
+ghost/
+kayitlar/
+transkript_*
+indirilenler/
+yuklemeler/
+kareler/
+ozetler/
+.onbellek/
+.isler.json
+.son_guncelleme
+sesler.json
+takip.json
+modeller/
+static/derlenmis/
+.cop/
+.yedek/
+*.m4a
+*.mp4
+*.webm
+*.docx
+*.srt
+*.jpg
+!docs/*.jpg
+
+# kesilen depo: örnek medya ve ekran görüntüsü depoya girer (monorepo'da *.mp4/*.jpg dışarıdaydı)
+!static/*_ornek/*.mp4
+!docs/ekran.jpg

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ghost">
+<meta name="theme-color" content="#08080a">
+<link rel="apple-touch-icon" href="/static/ikon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<title>Ghost</title>
+<!-- Telefonda tek kart (2026-10-24): günün sıradaki gönderisi; Kopyala ve X'te paylaş tek dokunuş. Ana ekrana eklenir. -->
+<style>
+  :root{--zemin:#08080a;--yuzey:#111114;--cizgi:rgba(255,255,255,.11);--yazi:#f4f4f6;--gri:#8e8e96;--pembe:#ff3d9a;--yesil:#30d158;--turuncu:#ffb340;
+        --mono:'Geist Mono',ui-monospace,monospace}
+  @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--zemin:#f7f7f5;--yuzey:#fff;--cizgi:rgba(0,0,0,.09);--yazi:#1c1c1e;--gri:#6e6e73}}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--zemin);color:var(--yazi);font:16px/1.45 Geist,-apple-system,system-ui,sans-serif;min-height:100vh;
+       padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 24px)}
+  .ust{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .ust b{font-size:22px;letter-spacing:-.02em}
+  .etk{font:600 11px/1 var(--mono);color:var(--gri);letter-spacing:.06em}
+  .kart{background:var(--yuzey);border:1px solid var(--cizgi);border-radius:18px;padding:16px;box-shadow:0 0 0 1px rgba(255,61,154,.06),0 18px 50px -30px rgba(255,61,154,.5)}
+  .bag{font-size:13px;color:var(--gri);margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+  .bag b{color:var(--yazi);font-weight:600}
+  textarea{width:100%;background:none;border:0;color:inherit;font:inherit;font-size:18px;line-height:1.45;resize:none;outline:none;min-height:120px}
+  .say{font:500 12px var(--mono);color:var(--gri);text-align:right}
+  .say.asim{color:#ff453a}
+  .alt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  button,a.d{appearance:none;border:0;border-radius:14px;padding:15px 12px;font:600 16px Geist,system-ui,sans-serif;cursor:pointer;text-align:center;text-decoration:none}
+  .ana{background:var(--pembe);color:#fff;grid-column:1/-1}
+  .iki{background:rgba(127,127,135,.16);color:var(--yazi)}
+  .onay{margin-top:12px;display:none;gap:8px;flex-direction:column}
+  .onay.acik{display:flex}
+  .onay p{font-size:14px;color:var(--gri)}
+  .bos{color:var(--gri);text-align:center;padding:60px 10px}
+  .sira{margin-top:18px;font-size:13px;color:var(--gri);text-align:center}
+  .ret{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .ret button{flex:1 1 auto;padding:10px 10px;font-size:14px;font-weight:500;border-radius:12px;background:rgba(127,127,135,.10);color:var(--gri)}
+  .ret .kal{background:rgba(48,209,88,.14);color:var(--yesil);font-weight:600}
+  .toast{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);background:var(--yazi);color:var(--zemin);padding:12px 14px;border-radius:12px;
+         font-size:14px;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}
+  .toast.acik{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="ust"><b>Ghost</b><span class="etk" id="etk">BUGÜN</span></div>
+<div id="kok"><p class="bos">Yükleniyor…</p></div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+let L = [], n = 0, ilk = true;
+// 27 Ekim: kararlar telefondan da tek dokunuş (Kalsın / neden); her biri Ghost'un o türden öğrenmesi, nedensiz toplu ret yerine
+const RET = [['konu uymuyor', 'Konu değil'], ['açı zayıf', 'Bariz'], ['ben değilim', 'Ben değilim'], ['yazım kötü', 'Cümle kötü']];
+const gecKey = 'ghTekGec_' + new Date().toLocaleDateString('sv');
+const gecilen = () => { try{ return new Set(JSON.parse(localStorage.getItem(gecKey) || '[]')); }catch(e){ return new Set(); } };
+const gecEkle = k => { try{ const s = gecilen(); s.add(k); localStorage.setItem(gecKey, JSON.stringify([...s])); }catch(e){} };
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('acik'); clearTimeout(toast.z); toast.z = setTimeout(() => t.classList.remove('acik'), 2600); }
+async function yukle(){
+  try{
+    const d = await (await fetch('/api/paylasimlar' + (ilk ? '?z=1' : ''))).json(), G = gecilen(); ilk = false;
+    L = (d.taslaklar || []).filter(x => x.plan_gun === 'Bugün' && (x.platform || 'x') === 'x' && !x.begendi && !x.gizli);
+    L = [...L.filter(x => !G.has(x.temel + '#' + x.i)), ...L.filter(x => G.has(x.temel + '#' + x.i))]; n = 0; ciz();
+  }catch(e){ $('#kok').innerHTML = '<p class="bos">Ghost’a ulaşılamadı. Mac açık ve aynı ağda mısınız?</p>'; }
+}
+function baglam(x){
+  if (x.yanit_to) return `<span>Yanıt:</span><b>@${esc(x.yanit_to.kullanici)}</b><span>${esc(String(x.yanit_to.metin || '').slice(0, 90))}</span>`;
+  if ((x.zincir || []).length > 1) return `<b>Haftanın hikâyesi</b><span>${x.zincir.length} parça</span>`;
+  if (x.alinti) return `<span>Alıntı:</span><b>@${esc(x.alinti.kullanici || '')}</b>`;
+  if (x.paylas_link){ try{ return `<span>Bağlantı:</span><b>${esc(new URL(x.paylas_link).hostname.replace(/^www\./, ''))}</b>`; }catch(e){} }
+  return '';
+}
+function ciz(){
+  const x = L[n];
+  $('#etk').textContent = L.length ? `BUGÜN · ${n + 1}/${L.length}` : 'BUGÜN';
+  if (!x){ $('#kok').innerHTML = '<p class="bos">Bugün için hazır gönderi yok.<br>Sabah 07.30’da yenileri gelir.</p>'; return; }
+  $('#kok').innerHTML = `<div class="kart"><div class="bag">${baglam(x)}</div><textarea id="m" spellcheck="false">${esc(x.metin)}</textarea><div class="say" id="say"></div>
+    <div class="alt"><button class="ana" id="pay">${x.yanit_to ? 'X’te yanıtla' : (x.zincir || []).length > 1 ? 'Zinciri paylaş' : 'X’te paylaş'}</button><button class="iki" id="kop">Kopyala</button><button class="iki" id="gec">Sonraki</button></div>
+    <div class="ret"><button class="kal" id="kal">Kalsın</button>${RET.map(([k, a]) => `<button data-ret="${esc(k)}">${a}</button>`).join('')}</div>
+    <div class="onay" id="onay"><p>X açıldı. Paylaştınız mı?</p><button class="ana" id="ok">Evet, paylaştım</button><button class="iki" id="hayir">Henüz değil</button></div></div>
+    ${L.length > 1 ? `<p class="sira">Sırada ${L.length - n - 1} gönderi daha</p>` : ''}`;
+  const m = $('#m'), boy = () => { m.style.height = 'auto'; m.style.height = m.scrollHeight + 'px'; const u = m.value.length; $('#say').textContent = u + '/280'; $('#say').classList.toggle('asim', u > 280); };
+  m.oninput = boy; boy();
+  const metin = () => m.value.trim();
+  const kaydet = async ek => { try{ const r = await fetch(`/api/paylasim/${encodeURIComponent(x.temel)}/${x.i}`, {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({...(metin() !== x.metin ? {metin: metin(), eski: x.metin} : {}), ...ek})}); return r.ok; }catch(e){ return false; } };
+  $('#kop').onclick = async () => { try{ await navigator.clipboard.writeText((x.zincir || []).length > 1 ? [metin(), ...x.zincir.slice(1)].join('\n\n') : metin() + (x.paylas_link && !x.alinti ? '\n\n' + x.paylas_link : '')); toast('Kopyalandı'); kaydet({kopyalandi: true}); }catch(e){ m.select(); toast('Seçildi; kopyalayın'); } };
+  $('#gec').onclick = () => { gecEkle(x.temel + '#' + x.i); n = (n + 1) % L.length; ciz(); };
+  $('#pay').onclick = async () => {
+    let u;
+    if (x.yanit_to) u = 'https://x.com/intent/post?in_reply_to=' + encodeURIComponent(x.yanit_to.id) + '&text=' + encodeURIComponent(metin());
+    else if ((x.zincir || []).length > 1){ u = 'https://x.com/intent/post?text=' + encodeURIComponent(x.zincir[0]); try{ await navigator.clipboard.writeText(x.zincir.slice(1).join('\n\n')); toast('Kalan parçalar panoda'); }catch(e){} }
+    else u = 'https://x.com/intent/post?text=' + encodeURIComponent(metin()) + (x.paylas_link ? '&url=' + encodeURIComponent(x.paylas_link) : '');
+    if (metin() !== x.metin) await kaydet({});
+    window.open(u, '_blank'); $('#onay').classList.add('acik');
+  };
+  $('#ok').onclick = async () => { const ok = await kaydet({paylasildi: true}); toast(ok ? 'Kaydedildi; Ghost bundan öğreniyor' : 'Kaydedilemedi'); setTimeout(yukle, 500); };
+  $('#hayir').onclick = () => $('#onay').classList.remove('acik');
+  const sonraki = m => { toast(m); L.splice(n, 1); if (n >= L.length) n = 0; ciz(); };
+  $('#kal').onclick = async () => { if (await kaydet({begendi: true})) sonraki('Kaldı; Bugün’de öne alındı'); else toast('Kaydedilemedi'); };
+  document.querySelectorAll('[data-ret]').forEach(b => b.onclick = async () => {
+    if (await kaydet({gizli: true, neden: b.dataset.ret})) sonraki(b.textContent + ': kaldırıldı, Ghost öğrendi'); else toast('Kaydedilemedi'); });
+}
+yukle();
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('#onay')?.classList.contains('acik')) yukle(); });
+</script>
+</body>
+</html>

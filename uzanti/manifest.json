@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Ghost",
+  "description": "Ghost for X: reads (never writes) your own posts and their numbers, your bookmarks, lists and the posts you open, and hands them to the Ghost app on this Mac so drafts sound like you and can quote what you saw. Talks only to 127.0.0.1.",
+  "version": "1.0",
+  "icons": {"16": "ikonlar/16.png", "32": "ikonlar/32.png", "48": "ikonlar/48.png", "128": "ikonlar/128.png"},
+  "permissions": ["storage", "alarms"],
+  "host_permissions": ["https://x.com/*", "https://www.instagram.com/*", "http://127.0.0.1:8767/*", "http://localhost:8767/*"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [
+    {"matches": ["https://x.com/*"], "js": ["x.js"], "run_at": "document_idle"},
+    {"matches": ["https://www.instagram.com/*"], "js": ["ig.js"], "run_at": "document_idle"}
+  ],
+  "action": {"default_title": "Ghost", "default_icon": {"16": "ikonlar/16.png", "32": "ikonlar/32.png"}}
+}

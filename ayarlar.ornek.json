@@ -1,0 +1,23 @@
+{
+ "_not": "Example settings. kurulum.sh copies this to ayarlar.json (kept out of git). Most options are changed from the app; the ones below are advanced. Örnek ayarlar; kurulum betiği ayarlar.json olarak kopyalar.",
+ "dil": "",
+ "claude": true,
+ "ozet": true,
+ "ozet_dili": "auto",
+ "ag_paylasimi": false,
+ "benim_adim": "",
+ "ghost_kesif": true,
+ "ghost_konu_toplantisi": true,
+ "ghost_tempo": true,
+ "ghost_bildirim": true,
+ "kendi_depolar": [],
+ "kendi_not": "",
+ "abonelikler": [],
+ "bultenler": false,
+ "bulten_kutulari": [],
+ "bulten_gonderenler": [],
+ "kantan": false,
+ "yerimleri_incele": false,
+ "secki_klasor_id": "",
+ "reklam_arsivi_tablolar": []
+}
