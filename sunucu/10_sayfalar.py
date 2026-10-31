@@ -6,7 +6,7 @@
 URUNLER_KURULU = set()
 if (KLASOR / "sunucu" / "21_studio.py").exists():        # 2026-10-29: Meet tek başına da kesilebilir (yehsohimself/meet); Studio'suz kurulumda 8765 Meet'tir
     URUNLER_KURULU.add("transcript")
-for _mod, _kod in (("content_site", "content"), ("couple_site", "atolye"), ("pt_site", "pt")):   # Content 27 Ekim kapatılıp aynı gün geri açıldı
+for _mod, _kod in (("content_site", "content"), ("couple_site", "atolye"), ("pt_site", "pt"), ("ledger_site", "ledger")):   # Content 27 Ekim kapatılıp aynı gün geri açıldı; Ledger 31 Ekim (8773)
     try:
         globals()[_mod] = __import__(_mod)
         globals()[_mod].kaydet(app)
@@ -19,7 +19,7 @@ for _parca, _kod in (("04_toplanti.py", "note"), ("07_ghost.py", "ghost")):
 
 
 # ----------------------------------------------------------------------------- sayfalar
-URUN_PORTLARI = {p: k for p, k in {8765: "transcript", 8766: "note", 8767: "ghost", 8768: "atolye", 8769: "content", 8771: "pt"}.items()
+URUN_PORTLARI = {p: k for p, k in {8765: "transcript", 8766: "note", 8767: "ghost", 8768: "atolye", 8769: "content", 8771: "pt", 8773: "ledger"}.items()
                  if k in URUNLER_KURULU}   # aynı motor, ayrı adresler (2026-10-20; Content 2026-10-23; Health 2026-10-25)
 if "transcript" not in URUNLER_KURULU and "note" in URUNLER_KURULU:
     URUN_PORTLARI[8765] = "note"            # uzantı ve kaydedici 8765 ile konuşur; Studio yoksa bu adres de Meet sayfasını açar
@@ -81,14 +81,14 @@ def ana():
     except (IndexError, ValueError):
         port = int(request.environ.get("SERVER_PORT") or PORT)      # adreste port yoksa (tünel, ters vekil): dinlenen port
     urun = URUN_PORTLARI.get(port, ANA_URUN)
-    sayfa = {"content": "content.html", "atolye": "couple.html", "pt": "pt.html"}.get(urun, "index.html")      # Content, Couple ve Health kendi sayfaları
+    sayfa = {"content": "content.html", "atolye": "couple.html", "pt": "pt.html", "ledger": "ledger.html"}.get(urun, "index.html")      # Content, Couple, Health ve Ledger kendi sayfaları
     html = (Path(app.static_folder) / sayfa).read_text(encoding="utf-8")
     if sayfa == "index.html" and "note" not in URUNLER_KURULU:        # Meet kurulu değilse (yalnız Studio) Meet'in eki istenmez (2026-10-25)
-        html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)
+        html = re.sub(r'<script src="/static/meet_(ek|asistan)\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html" and "atolye" not in URUNLER_KURULU:      # teslim kontrolü ve müşteri takibi Couple modülleriyle; yoksa ekler istenmez
         html = re.sub(r'<script src="/static/(teslim|takip)_ek\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html":                                         # her ek yalnız kendi ürününde çalışır; ötekiler onu hiç indirmesin (2026-10-29)
-        for ek, sahip in (("meet_ek", "note"), ("takip_ek", "note"), ("studio_ek", "transcript"), ("teslim_ek", "transcript")):
+        for ek, sahip in (("meet_ek", "note"), ("meet_asistan", "note"), ("takip_ek", "note"), ("studio_ek", "transcript"), ("teslim_ek", "transcript"), ("ghost_ek", "ghost")):
             if urun != sahip:
                 html = re.sub(rf'<script src="/static/{ek}\.js[^"]*"></script>\n?', "", html)
     if sayfa == "index.html" and urun != "transcript" and (Path(app.static_folder) / f"{urun}.webmanifest").exists():

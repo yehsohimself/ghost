@@ -14,7 +14,7 @@ import urllib.error
 import urllib.request
 
 SITE = "http://127.0.0.1:8765"
-KAPILAR = range(8765, 8772)
+KAPILAR = range(8765, 8774)   # 2026-10-31: 8772 Office, 8773 Ledger
 
 
 def yabanci_kapilar():

@@ -156,6 +156,16 @@ def _kaynak_video(temel, en_az=0):
     return en_iyi, v
 
 
+# 2026-10-31: altyazılı video ve dublaj işleri aynı anda başlayınca kaynak video iki kez iniyordu ([720p] ve [720p]_2; dublaj yolu indirdiğini
+# dizine de yazmıyordu). Aynı link için tek kilit: ikinci iş kilidi alınca yeniden bakar, ilki indirdiyse onu kullanır. (threading 00'dan.)
+_KAYNAK_KILIT, _KAYNAK_KILIT_K = {}, threading.Lock()
+
+
+def _kaynak_kilidi(link):
+    with _KAYNAK_KILIT_K:
+        return _KAYNAK_KILIT.setdefault(link or "", threading.Lock())
+
+
 def _video_isi_baslat(v):
     """Altyazılı video ya da klip işini kuyruğa alır (v: islem, temel, dil, stil, kesit, kalite)."""
     temel = v.get("temel") or ""
@@ -205,13 +215,18 @@ def _dublaj_isi(is_):
         link = (veri or {}).get("link") or ""
         if not re.match(r"^https?://", link):
             is_["durum"] = "hata"; is_["hata"] = "Bu transkriptin kaynak videosu bulunamadı."; return
-        is_["log"].append("Kaynak video indiriliyor (720p)")
-        kod = _alt_surec(is_, [PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", "720", "--klasor", str(INDIRILENLER)] + (["--cerez", is_["cerez"]] if is_.get("cerez") else []), _satir_isle_indir)
-        if kod is None:
-            return
-        if kod != 0 or not is_.get("dosya"):
-            is_["durum"] = "hata"; is_["hata"] = _hata_metni("\n".join(is_["log"][-40:])); return
-        kaynak = Path(is_["dosya"]); is_.pop("dosya", None)
+        with _kaynak_kilidi(link):
+            kaynak, _ = _kaynak_video(temel)          # başka bir iş az önce indirmiş olabilir
+            if kaynak is None:
+                is_["log"].append("Kaynak video indiriliyor (720p)")
+                kod = _alt_surec(is_, [PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", "720", "--klasor", str(INDIRILENLER)] + (["--cerez", is_["cerez"]] if is_.get("cerez") else []), _satir_isle_indir)
+                if kod is None:
+                    return
+                if kod != 0 or not is_.get("dosya"):
+                    is_["durum"] = "hata"; is_["hata"] = _hata_metni("\n".join(is_["log"][-40:])); return
+                kaynak = Path(is_["dosya"]); is_.pop("dosya", None)
+                _indirme_bitir({"dosya": str(kaynak), "link": link, "baslik": is_.get("baslik") or temel, "kanal": is_.get("kanal", ""), "kalite": "720",
+                                "sure": (veri or {}).get("sure", 0), "kapak": is_.get("kapak"), "platform": (veri or {}).get("platform", ""), "log": []})
     is_["adim"] = 2; is_["adim_metni"] = "Seslendiriliyor"; _kaydet()
     ad = re.sub(r"\s*\[[^\]]*\]\s*$", "", Path(kaynak).stem)
     ek_ad = " önizleme" if is_.get("onizleme") else ""
@@ -323,19 +338,22 @@ def _video_isi_calistir(is_):
         link = (veri or {}).get("link") or ""
         if not re.match(r"^https?://", link):
             is_["durum"] = "hata"; is_["hata"] = "Bu transkriptin kaynak videosu bulunamadı."; return
-        is_["log"].append(f"Kaynak video indiriliyor ({is_['kalite']}p)")
-        komut = [PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", is_["kalite"], "--klasor", str(INDIRILENLER)]
-        if is_.get("cerez"):
-            komut += ["--cerez", is_["cerez"]]
-        kod = _alt_surec(is_, komut, _satir_isle_indir)
-        if kod is None:
-            return
-        if kod != 0 or not is_.get("dosya"):
-            is_["durum"] = "hata"; is_["hata"] = _hata_metni("\n".join(is_["log"][-40:])); return
-        ara_is = {"dosya": is_["dosya"], "link": link, "baslik": is_["baslik"], "kanal": is_.get("kanal", ""), "kalite": is_["kalite"],
-                  "sure": veri.get("sure", 0), "kapak": is_.get("kapak"), "platform": veri.get("platform", ""), "log": []}
-        _indirme_bitir(ara_is)
-        kaynak = Path(is_["dosya"]); is_.pop("dosya", None); is_["ilerleme"] = 0
+        with _kaynak_kilidi(link):
+            kaynak, _ = _kaynak_video(temel, en_az=int(is_.get("en_az") or 0))   # başka bir iş az önce indirmiş olabilir
+            if kaynak is None:
+                is_["log"].append(f"Kaynak video indiriliyor ({is_['kalite']}p)")
+                komut = [PYTHON, "-u", str(INDIR_SCRIPT), link, "--kalite", is_["kalite"], "--klasor", str(INDIRILENLER)]
+                if is_.get("cerez"):
+                    komut += ["--cerez", is_["cerez"]]
+                kod = _alt_surec(is_, komut, _satir_isle_indir)
+                if kod is None:
+                    return
+                if kod != 0 or not is_.get("dosya"):
+                    is_["durum"] = "hata"; is_["hata"] = _hata_metni("\n".join(is_["log"][-40:])); return
+                ara_is = {"dosya": is_["dosya"], "link": link, "baslik": is_["baslik"], "kanal": is_.get("kanal", ""), "kalite": is_["kalite"],
+                          "sure": veri.get("sure", 0), "kapak": is_.get("kapak"), "platform": veri.get("platform", ""), "log": []}
+                _indirme_bitir(ara_is)
+                kaynak = Path(is_["dosya"]); is_.pop("dosya", None); is_["ilerleme"] = 0
     is_["adim"] = 2
     komut = [PYTHON, "-u", str(YAKMA_SCRIPT), str(KLASOR / f"{temel}.json"), "--video", str(kaynak), "--stil", is_["stil"]]
     if is_.get("font"):

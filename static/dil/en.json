@@ -3927,7 +3927,46 @@
 "Haftalık değerlendirmelerdeki genel puanın gidişi": "How the overall score moved across weekly reviews",
 "hedef": "target",
 "Taslak kapıdan geçmedi": "Draft didn't pass the gate",
-"Okur taslağı yeterince taze bulmadı; farklı bir ayrıntıdan yeniden yazılır": "The reader didn't find the draft fresh enough; it is rewritten from a different detail"
+"Okur taslağı yeterince taze bulmadı; farklı bir ayrıntıdan yeniden yazılır": "The reader didn't find the draft fresh enough; it is rewritten from a different detail",
+"Konuş": "Talk",
+"Konuşalım": "Let's talk",
+"Ghost’la konuşma": "Talk to Ghost",
+"İletişim danışmanınız ve yazı ortağınız": "Your communications advisor and writing partner",
+"Düşünüyor…": "Thinking…",
+"Yazıyor…": "Writing…",
+"Ghost’a yazın; soru da sorabilirsiniz": "Write to Ghost; you can ask questions too",
+"Gönder (↩)": "Send (↩)",
+"Kapat (Esc)": "Close (Esc)",
+"Yeni konuşma başlat": "Start a new conversation",
+"Danışman sayfasını aç": "Open the advisor page",
+"Yeni konuşma; eskisi saklandı": "New conversation; the old one is saved",
+"Gönderi taslağı": "Post draft",
+"Taslağı düzelt": "Fix the draft",
+"Ghost yazsın": "Let Ghost write it",
+"Görüş defterine": "To your opinion notebook",
+"Fikir defterine": "To your idea notebook",
+"Bunu öğren": "Learn this",
+"Planı değiştir": "Change the plan",
+"Uygula": "Apply",
+"Yazsın": "Write it",
+"Yapıldı": "Done",
+"Taslaklarınızda": "In your drafts",
+"Taslaklara ekle": "Add to drafts",
+"X gönderisi": "X post",
+"LinkedIn’de aç": "Open in LinkedIn",
+"Konu yörüngesi": "Topic orbit",
+"Ghost’un önerdiği": "Suggested by Ghost",
+"Sizin paylaştığınız": "Posted by you",
+"Kalın kol: önem verdiğiniz alan": "Thick line: a topic you care about",
+"Son 28 gün · bir alana dokunun, Ghost’la konuşun": "Last 28 days · tap a topic to talk with Ghost",
+"Okurun gözünden": "Through the reader's eyes",
+"Bu kartı Ghost’la konuşun: neden böyle, ne yapmalı?": "Talk about this card with Ghost: why, and what to do?",
+"Ghost’un sorusu üzerine": "About Ghost's question",
+"Genel konuşmaya dön": "Back to the general conversation",
+"Aklınızdakini yazın. Soru sorun, itiraz edin, “emin değilim” deyin; birlikte düşünürüz.": "Write what's on your mind. Ask, push back, say “not sure”; we'll think it through together.",
+"Ghost’la konuşun (⌘J)": "Talk to Ghost (⌘J)",
+"Taslaklarınıza da eklendi; paylaştıysanız orada işaretleyin": "Also added to your drafts; mark it there once posted",
+"Metin panoda; LinkedIn’e yapıştırın": "Text copied; paste it into LinkedIn"
 },
 "patterns": [
 [
@@ -5765,6 +5804,26 @@
 [
 "^hedef (\\d+)$",
 "target $1"
+],
+[
+"^Bu taslak üzerine: (.*)$",
+"On this draft: $1"
+],
+[
+"^Haftanın planı: (.*)$",
+"This week's plan: $1"
+],
+[
+"^Puan kartı: (.*)$",
+"Scorecard: $1"
+],
+[
+"^Gündem: (.*)$",
+"Agenda: $1"
+],
+[
+"^Şu an cevap veremiyorum: (.*)$",
+"I can't answer right now: $1"
 ]
 ]
 }

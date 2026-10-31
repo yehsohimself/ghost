@@ -3202,7 +3202,7 @@ async function indirilendenBaslat(x){
 /* ürünler: aynı motor ve ortak hafıza, ayrı adresler (2026-10-20) */
 const URUNLER = {transcript:{ad:'Studio', port:8765, yuz:['video','kitaplik'], acik:'video'}, note:{ad:'Meet', port:8766, yuz:['toplanti'], acik:'toplanti'},
   ghost:{ad:'Ghost', port:8767, yuz:['paylasim'], acik:'paylasim'}, atolye:{ad:'Couple', port:8768, yuz:['atolye'], acik:'atolye', menude:false},   /* 25 Ekim: Couple kapandı (teslim kontrolü Studio'da, müşteri takibi Meet'te) */
-  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}};   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
+  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}, ledger:{ad:'Ledger', port:8773, yuz:[], acik:''}};   // Ledger 31 Ekim: 8772 Office'in   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
 const URUN = document.documentElement.dataset.urun || 'transcript', URUN_AD = URUNLER[URUN].ad;
 /* Şirket renkleri (24 Ekim): kırık beyaz #F4F2EE, mor #9A1FF4 gibi açık renkler. Açık renk zeminde yazı koyu; açık temada açık renk çizgi kaybolmasın diye bir ton koyusu */
 function srAcik(h){ const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return false; const v = parseInt(m[1], 16), r = (v >> 16 & 255) / 255, g = (v >> 8 & 255) / 255, b = (v & 255) / 255; return .2126 * r + .7152 * g + .0722 * b > .7; }
@@ -6980,9 +6980,11 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=34"></script>
+<script src="/static/studio_ek.js?v=40"></script>
 <script src="/static/meet_ek.js?v=26"></script>
+<script src="/static/meet_asistan.js?v=3"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=2"></script>
+<script src="/static/ghost_ek.js?v=5"></script>
 </body>
 </html>

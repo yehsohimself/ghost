@@ -174,7 +174,7 @@ def _paylasilan_taslaklar(gun=28):
         for t in p["taslaklar"]:
             z = t.get("paylasim_zaman") or 0
             if t.get("paylasildi") and z >= sinir:
-                out.append({"zaman": z, "alan": t.get("alan") or "", "dayanak": t.get("dayanak") or "", "duzenlendi": bool(t.get("duzenlendi")),
+                out.append({"zaman": z, "alan": t.get("alan_kod") or t.get("alan") or "", "dayanak": t.get("dayanak") or "", "duzenlendi": bool(t.get("duzenlendi")),
                             "platform": t.get("platform") or "x", "link": bool(t.get("paylas_link") or t.get("alinti")), "kaynak_tur": veri.get("kaynak_tur") or "",
                             "metin": str(t.get("metin") or "")[:300]})
     return sorted(out, key=lambda x: -x["zaman"])
@@ -339,6 +339,36 @@ def puan(gun=28):
             "eksikler": [b for b in B if b["eksik"]]}
 
 
+def konu_haritasi(gun=28):
+    """Alan alan denge (2026-10-31): ağırlık (profil), Ghost'un önerdiği taslak sayısı, paylaşılan (Ghost + X'te okunan gerçek gönderiler). Danışman'da
+    yörünge görseli. Döner [{kod, ad, agirlik, oneri, paylasilan}]."""
+    import kitaplik_onbellek
+    import paylasim
+    pr = paylasim.profil()
+    alanlar = [a for a in pr.get("alanlar") or [] if isinstance(a, dict) and (a.get("agirlik") or 0) > 0]
+    ad_kod = {str(a.get("ad") or "").lower(): a.get("kod") for a in alanlar}
+    sinir = time.time() - gun * 86400
+    oneri, pay = collections.Counter(), collections.Counter()
+    for k in kitaplik_onbellek.hepsi(ghost=True):
+        p = k["veri"].get("paylasim") or {}
+        if k["veri"].get("toplanti") or (p.get("ilk_zaman") or p.get("zaman") or 0) < sinir:
+            continue
+        for t in p.get("taslaklar") or []:
+            kod = t.get("alan_kod") or ad_kod.get(str(t.get("alan") or "").lower())
+            if kod:
+                oneri[kod] += 1
+    for t in _paylasilan_taslaklar(gun):
+        kod = t["alan"] if t["alan"] in ad_kod.values() else ad_kod.get(str(t["alan"]).lower())
+        if kod:
+            pay[kod] += 1
+    for x in _gercek_gonderiler(gun):
+        if not x.get("ghost"):
+            kod = _alan_tahmin(x.get("metin"), pr)
+            if kod:
+                pay[kod] += 1
+    return [{"kod": a.get("kod"), "ad": a.get("ad"), "agirlik": a.get("agirlik"), "oneri": oneri[a.get("kod")], "paylasilan": pay[a.get("kod")]} for a in alanlar]
+
+
 # ---------------------------------------------------------------- 4) yaklaşan gündem
 def _gundem_oku():
     try:
@@ -496,7 +526,7 @@ def durum():
     d = _oku()
     return {"gorusme_gerekli": gorusme_gerekli(), "strateji": strateji(), "sorular": GORUSME, "puan": puan(), "rapor": d.get("rapor") or {},
             "gecmis": d.get("gecmis") or [], "gundem": [m for m in _gundem_oku().get("maddeler") or [] if str(m.get("tarih")) >= date.today().isoformat()],
-            "gundem_zaman": _gundem_oku().get("zaman") or 0, "yaklasan": yaklasan(3), "plan": plan(), "ritim": ritim()}
+            "gundem_zaman": _gundem_oku().get("zaman") or 0, "yaklasan": yaklasan(3), "plan": plan(), "ritim": ritim(), "harita": konu_haritasi()}
 
 
 # ---------------------------------------------------------------- 5) planın takibi ve dürtme (2026-10-31: "beni push etmeli programımı yaptırmaya")
