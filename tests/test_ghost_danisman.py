@@ -90,3 +90,58 @@ def test_secki_kesfe_madde_olur(kok, monkeypatch):
     M = kesif.secki_maddeleri(log=lambda m: None)
     assert len(M) == 1 and M[0]["alan"] == "teknoloji" and M[0]["kesif_secki"] == "2026-10-30" and "Kanıt sınırı" in M[0]["ozet"]
     assert kesif.derin_mi(M[0]) and M[0]["resim"] == ""
+
+
+def test_plan_takibi_ve_ritim(kok, monkeypatch):
+    """Haftalık plan gün gün izlenir: o gün paylaşım varsa 'paylasildi', geçtiyse 'kacirildi', bugün 'bugun'; ritim haftalık sayıları ve seriyi verir."""
+    from datetime import date, timedelta
+    g = _modul(kok)
+    for f in (kok / "ghost").glob("*.json"):                    # önceki testlerin paylaşılmış kayıtları günleri boyamasın
+        f.unlink()
+    assert g._gun_no("Cumartesi") == 5 and g._gun_no("Cuma") == 4 and g._gun_no("Pzt") == 0 and g._gun_no("hiç") is None
+    bugun = date.today(); dun = bugun - timedelta(days=1); yarin = bugun + timedelta(days=1)
+    gun_ad = lambda d: g.GUN_ADLARI[d.weekday()].capitalize()   # noqa: E731
+    # tarihsiz plan: gün adından bugünden sonraki ilk karşılık; bozuk tarih de düzeltilir
+    H = g._hafta_tarihle([{"gun": gun_ad(yarin), "ne": "a"}, {"gun": "Salı", "tarih": "2001-01-01", "ne": "b"}], bugun)
+    assert H[0]["tarih"] == yarin.isoformat() if H[0]["ne"] == "a" else True
+    assert all(bugun <= date.fromisoformat(x["tarih"]) <= bugun + timedelta(days=7) for x in H)
+    d = g._oku(); d["rapor"] = {"zaman": time.time() - 86400, "not": "n", "hafta": [
+        {"gun": gun_ad(dun), "tarih": dun.isoformat(), "ne": "dünkü", "neden": "", "mecra": "X"},
+        {"gun": gun_ad(bugun), "tarih": bugun.isoformat(), "ne": "bugünkü", "neden": "", "mecra": "LinkedIn"},
+        {"gun": gun_ad(yarin), "tarih": yarin.isoformat(), "ne": "yarınki", "neden": "", "mecra": "X"}]}; g._yaz(d)
+    monkeypatch.setattr(g, "_gercek_gonderiler", lambda gun=28: [])
+    p = g.plan()
+    assert [x["durum"] for x in p["maddeler"]] == ["kacirildi", "bugun", "bekliyor"] and p["ozet"]["kacirilan"] == 1 and p["ozet"]["bugun"]["ne"] == "bugünkü"
+    assert "LinkedIn" in g.plan_girdisi(p["maddeler"][1]) and g.plan_girdisi(p["maddeler"][2]).startswith("yarınki")
+    # dün bir şey paylaşılmışsa kaçırılmış sayılmaz; bugün taslak yazıldıysa 'hazir', paylaşılınca 'paylasildi'
+    _ghost_kaydi(kok, time.time() - 86400, [{"metin": "x", "alan": "futbol", "paylasildi": True, "paylasim_zaman": time.time() - 86400}])
+    (kok / "ghost" / "20990101000000_plan.json").write_text(json.dumps({"veri": {"baslik": "p", "kaynak_tur": "fikir", "paylasim": {"taslaklar": [{"metin": "t"}]}}, "segmentler": []}), encoding="utf-8")
+    g.plan_isaretle(1, hazirlandi="ghost__20990101000000_plan")
+    p = g.plan()
+    assert p["maddeler"][0]["durum"] == "paylasildi" and p["maddeler"][1]["taslak"] == "hazir" and p["maddeler"][1]["durum"] == "bugun"
+    (kok / "ghost" / "20990101000000_plan.json").write_text(json.dumps({"veri": {"baslik": "p", "kaynak_tur": "fikir", "paylasim": {"taslaklar": [{"metin": "t", "paylasildi": True, "paylasim_zaman": time.time()}]}}, "segmentler": []}), encoding="utf-8")
+    p = g.plan()
+    assert p["maddeler"][1]["durum"] == "paylasildi" and p["ozet"]["paylasilan"] == 2
+    r = g.ritim(4)
+    assert len(r["haftalar"]) == 4 and r["haftalar"][-1]["bu"] and r["seri"] >= 1 and r["bu_hafta"] >= 1
+    assert g.plan_saati() == 10
+
+
+def test_plan_ucu_taslak_yazar_ve_isaretler(kok, istemci, monkeypatch):
+    from datetime import date
+    g = _modul(kok)
+    for f in (kok / "ghost").glob("*.json"):
+        f.unlink()
+    bugun = date.today()
+    d = g._oku(); d["rapor"] = {"zaman": time.time(), "not": "n", "hafta": [{"gun": g.GUN_ADLARI[bugun.weekday()].capitalize(), "tarih": bugun.isoformat(), "ne": "bugünkü plan", "neden": "çünkü", "mecra": "X"}]}; g._yaz(d)
+    monkeypatch.setattr(g, "_gercek_gonderiler", lambda gun=28: [])
+    import vh_site
+    yazilan = {}
+    monkeypatch.setattr(vh_site, "_ghost_fikirden_yaz", lambda girdi, deneyim="", ek=None: yazilan.update(girdi=girdi, ek=ek) or "ghost__deneme", raising=False)
+    assert istemci.post("/api/ghost/danisman/plan/7", json={"hazirlan": True}).status_code == 404
+    r = istemci.post("/api/ghost/danisman/plan/0", json={"hazirlan": True}).get_json()
+    assert r["temel"] == "ghost__deneme" and yazilan["girdi"].startswith("bugünkü plan") and yazilan["ek"]["plan"] == bugun.isoformat()
+    j = istemci.get("/api/ghost/danisman").get_json()
+    assert j["plan"]["maddeler"][0]["hazirlandi"] == "ghost__deneme" and "ritim" in j
+    assert istemci.post("/api/ghost/danisman/plan/0", json={"paylasildi": True}).get_json()["tamam"]
+    assert istemci.get("/api/ghost/danisman").get_json()["plan"]["maddeler"][0]["durum"] == "paylasildi"

@@ -303,7 +303,8 @@ def ayarlar_post():
         d["claude_toplanti"] = bool(v["claude_toplanti"])
     if "danisman" in v:
         d["danisman"] = bool(v["danisman"])
-    for k in ("canli_asistan", "oto_gorev", "toplanti_kapisi", "ghost_konu_toplantisi", "kayit_gostergesi"):
+    for k in ("canli_asistan", "oto_gorev", "toplanti_kapisi", "ghost_konu_toplantisi", "kayit_gostergesi",
+              "ghost_yanit", "ghost_hikaye", "ghost_gelisim", "ghost_plan_oto", "ghost_bildirim"):      # 31 Ekim: Ghost anahtarları hiç yazılmıyordu
         if k in v:
             d[k] = bool(v[k])
     if "gun_ucreti" in v:

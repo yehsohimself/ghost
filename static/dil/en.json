@@ -3896,7 +3896,38 @@
 "Bir iş ya da teklif": "A job or an offer",
 "görünürlüğün karşılığı": "visibility paying off",
 "Düzenli yazan biri olmak": "Being someone who writes regularly",
-"alışkanlığın kendisi": "the habit itself"
+"alışkanlığın kendisi": "the habit itself",
+"Şimdi bitir": "End now",
+"Kaydı bitir": "End recording",
+"Toplantı sürüyorsa gerisi kaydedilmez. Kayıt kapanır ve notlar hazırlanır.": "If the meeting is still on, the rest will not be recorded. The recording closes and the notes are prepared.",
+"Kayıt bitiriliyor; notlar birkaç dakikada hazır olur": "Ending the recording; notes will be ready in a few minutes",
+"Süren kayıt yok": "No recording in progress",
+"Bitir": "End",
+"Haftanın hattı": "The week's line",
+"Bugünün planı": "Today's plan",
+"Taslağı yaz": "Write the draft",
+"Şimdiden yaz": "Write it now",
+"Taslağı aç": "Open the draft",
+"Paylaşıldı": "Posted",
+"Kaçtı": "Missed",
+"Bugün yaz": "Write it today",
+"Taslak yazılıyor…": "Writing the draft…",
+"Son 8 hafta": "Last 8 weeks",
+"Bugünün planı paylaşıldı": "Today's plan is posted",
+"Taslak zaten yazılıyor": "The draft is already being written",
+"Taslak yazılıyor; bir iki dakikada Bugün’de": "Writing the draft; it lands in Today in a minute or two",
+"İşaretlendi": "Marked",
+"Taslak henüz hazır değil": "The draft isn't ready yet",
+"Bu günün gönderisini kendiniz paylaştıysanız": "If you posted this day's piece yourself",
+"Konu hâlâ değerse bugün için yazdırın": "If the topic still holds, have it written for today",
+"Günün planını hazırla": "Prepare the day's plan",
+"Günün planı taslağa çevrilecek": "The day's plan will become a draft",
+"Plan yalnız gösterilecek": "The plan will only be shown",
+"Danışmanın haftalık planında bugüne bir gönderi düştüyse, bakabildiğiniz saatte taslağı kendiliğinden yazar ve haber verir; akşam hâlâ paylaşılmamışsa bir kez daha hatırlatır.": "When the advisor's weekly plan has a post for today, Ghost writes the draft at the hour you can look and lets you know; if it is still unposted in the evening, it reminds you once more.",
+"Haftalık değerlendirmelerdeki genel puanın gidişi": "How the overall score moved across weekly reviews",
+"hedef": "target",
+"Taslak kapıdan geçmedi": "Draft didn't pass the gate",
+"Okur taslağı yeterince taze bulmadı; farklı bir ayrıntıdan yeniden yazılır": "The reader didn't find the draft fresh enough; it is rewritten from a different detail"
 },
 "patterns": [
 [
@@ -5698,6 +5729,42 @@
 [
 "^Danışman: (.*)$",
 "Advisor: $1"
+],
+[
+"^(\\d+)/(\\d+) plan günü paylaşıldı$",
+"$1/$2 planned days posted"
+],
+[
+"^(\\d+) kaçtı$",
+"$1 missed"
+],
+[
+"^(\\d+) gün üst üste$",
+"$1 days in a row"
+],
+[
+"^(\\d+)/(\\d+) gün paylaşıldı$",
+"$1/$2 days posted"
+],
+[
+"^Sırada · (.+)$",
+"Up next · $1"
+],
+[
+"^Bugünün planı · (.+)$",
+"Today's plan · $1"
+],
+[
+"^(\\d+) gün$",
+"$1 days"
+],
+[
+"^Bu hafta (\\d+) gönderi, hedefiniz (\\d+)\\. Danışman sayfasını açar$",
+"$1 posts this week, your target is $2. Opens the Advisor page"
+],
+[
+"^hedef (\\d+)$",
+"target $1"
 ]
 ]
 }

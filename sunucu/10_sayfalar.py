@@ -1,7 +1,7 @@
 # sunucu/10_sayfalar.py — Content kaydı ve ürün sayfaları.
 # site.py bu dosyayı diğer parçalarla AYNI ad alanında, numara sırasıyla yürütür; tek başına çalıştırılmaz.
 # ----------------------------------------------------------------------------- ürünler isteğe bağlı (2026-10-25: her ürün ayrı depo/kurulum olabilir)
-# Content (2026-10-23), Couple (2026-10-24) ve PT (2026-10-25) kendi modülleriyle kaydolur; modül yoksa o ürün bu kurulumda kapalıdır.
+# Content (2026-10-23), Couple (2026-10-24) ve Health (2026-10-25) kendi modülleriyle kaydolur; modül yoksa o ürün bu kurulumda kapalıdır.
 # Meet ve Ghost sunucu parçalarıyla gelir: parça dosyası yoksa kapalı. Kurulu ürünler sayfaya `data-urunler` ile verilir (menü ona göre).
 URUNLER_KURULU = set()
 if (KLASOR / "sunucu" / "21_studio.py").exists():        # 2026-10-29: Meet tek başına da kesilebilir (yehsohimself/meet); Studio'suz kurulumda 8765 Meet'tir
@@ -20,7 +20,7 @@ for _parca, _kod in (("04_toplanti.py", "note"), ("07_ghost.py", "ghost")):
 
 # ----------------------------------------------------------------------------- sayfalar
 URUN_PORTLARI = {p: k for p, k in {8765: "transcript", 8766: "note", 8767: "ghost", 8768: "atolye", 8769: "content", 8771: "pt"}.items()
-                 if k in URUNLER_KURULU}   # aynı motor, ayrı adresler (2026-10-20; Content 2026-10-23; PT 2026-10-25)
+                 if k in URUNLER_KURULU}   # aynı motor, ayrı adresler (2026-10-20; Content 2026-10-23; Health 2026-10-25)
 if "transcript" not in URUNLER_KURULU and "note" in URUNLER_KURULU:
     URUN_PORTLARI[8765] = "note"            # uzantı ve kaydedici 8765 ile konuşur; Studio yoksa bu adres de Meet sayfasını açar
 if 8765 not in URUN_PORTLARI and URUN_PORTLARI:
@@ -81,7 +81,7 @@ def ana():
     except (IndexError, ValueError):
         port = int(request.environ.get("SERVER_PORT") or PORT)      # adreste port yoksa (tünel, ters vekil): dinlenen port
     urun = URUN_PORTLARI.get(port, ANA_URUN)
-    sayfa = {"content": "content.html", "atolye": "couple.html", "pt": "pt.html"}.get(urun, "index.html")      # Content, Couple ve PT kendi sayfaları
+    sayfa = {"content": "content.html", "atolye": "couple.html", "pt": "pt.html"}.get(urun, "index.html")      # Content, Couple ve Health kendi sayfaları
     html = (Path(app.static_folder) / sayfa).read_text(encoding="utf-8")
     if sayfa == "index.html" and "note" not in URUNLER_KURULU:        # Meet kurulu değilse (yalnız Studio) Meet'in eki istenmez (2026-10-25)
         html = re.sub(r'<script src="/static/meet_ek\.js[^"]*"></script>\n?', "", html)

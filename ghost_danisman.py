@@ -468,8 +468,9 @@ def rapor(zorla=False, log=print):
              "Görev: 'siz' diliyle, kısa ve dürüst. Sayı uydurma; yalnız yukarıdaki veriyi kullan. Övme, klişe yok ('harika', 'potansiyel').\n"
              "not: 2-3 cümle; bu hafta hesabın gerçekten neye ihtiyacı var.\n"
              "eksikler: en çok 3; her biri {baslik (≤6 kelime), neden (tek cümle, veriye bağlı), aksiyon (tek somut adım, bu hafta yapılabilir)}.\n"
-             "hafta: 3-5 madde; her biri {gun (hafta günü adı), ne (hangi tür gönderi / konu), neden (stratejiye ya da gündeme bağlı tek cümle), "
-             "mecra (X | zincir | LinkedIn)}; yaklaşan gündemden en az biri varsa tarihinden 1-2 gün önce planla; kişinin bakabildiği saate uy.\n"
+             "hafta: 3-5 madde, bugünden başlayan 7 gün içinde; her biri {gun (hafta günü adı), tarih (YYYY-MM-DD), ne (hangi tür gönderi / konu), "
+             "neden (stratejiye ya da gündeme bağlı tek cümle), mecra (X | zincir | LinkedIn)}; yaklaşan gündemden en az biri varsa tarihinden 1-2 gün önce "
+             "planla; kişinin bakabildiği saate uy.\n"
              "kacin: tek cümle, bu hafta yapmaması gereken.\n"
              'JSON: {"not": "...", "eksikler": [...], "hafta": [...], "kacin": "..."}')
     try:
@@ -481,7 +482,7 @@ def rapor(zorla=False, log=print):
         return r
     r = {"zaman": time.time(), "not": str(c.get("not"))[:800], "kacin": str(c.get("kacin") or "")[:300],
          "eksikler": [{k: str(e.get(k) or "")[:300] for k in ("baslik", "neden", "aksiyon")} for e in (c.get("eksikler") or []) if isinstance(e, dict)][:3],
-         "hafta": [{k: str(e.get(k) or "")[:300] for k in ("gun", "ne", "neden", "mecra")} for e in (c.get("hafta") or []) if isinstance(e, dict)][:5],
+         "hafta": _hafta_tarihle([{k: str(e.get(k) or "")[:300] for k in ("gun", "tarih", "ne", "neden", "mecra")} for e in (c.get("hafta") or []) if isinstance(e, dict)][:5]),
          "puan": P["genel"], "model": claude_yaz.SON_MODEL if hasattr(claude_yaz, "SON_MODEL") else ""}
     d["rapor"] = r
     d.setdefault("gecmis", []).append({"zaman": r["zaman"], "puan": P["genel"], "boyutlar": {b["kod"]: b["puan"] for b in P["boyutlar"]}})
@@ -495,7 +496,175 @@ def durum():
     d = _oku()
     return {"gorusme_gerekli": gorusme_gerekli(), "strateji": strateji(), "sorular": GORUSME, "puan": puan(), "rapor": d.get("rapor") or {},
             "gecmis": d.get("gecmis") or [], "gundem": [m for m in _gundem_oku().get("maddeler") or [] if str(m.get("tarih")) >= date.today().isoformat()],
-            "gundem_zaman": _gundem_oku().get("zaman") or 0, "yaklasan": yaklasan(3)}
+            "gundem_zaman": _gundem_oku().get("zaman") or 0, "yaklasan": yaklasan(3), "plan": plan(), "ritim": ritim()}
+
+
+# ---------------------------------------------------------------- 5) planın takibi ve dürtme (2026-10-31: "beni push etmeli programımı yaptırmaya")
+GUN_ADLARI = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
+GUN_KISA = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
+PLAN_SAATI = {"sabah": 8, "ogle": 12, "aksam": 18, "degisir": 10}      # günün planı bu saatte taslağa çevrilir ve hatırlatılır
+AKSAM_SAATI = 20                                                       # paylaşılmamışsa akşam tek dürtme
+
+
+def _gun_no(ad):
+    a = str(ad or "").strip().lower().replace("i̇", "i")
+    for i in sorted(range(7), key=lambda k: -len(GUN_ADLARI[k])):        # "cumartesi" "cuma"dan önce denenir
+        if a.startswith(GUN_ADLARI[i]) or a == GUN_KISA[i].lower():
+            return i
+    for i, g in enumerate(GUN_ADLARI):
+        if a[:3] == g[:3] and i != 5:
+            return i
+    return None
+
+
+def _hafta_tarihle(hafta, bas=None):
+    """Modelin verdiği tarihler geçerliyse kalır; yoksa gün adının bugünden sonraki (bugün dahil) ilk karşılığı."""
+    bas = bas or date.today()
+    out = []
+    for x in hafta:
+        t = str(x.get("tarih") or "")
+        try:
+            dt = date.fromisoformat(t)
+            if not (bas - timedelta(days=1) <= dt <= bas + timedelta(days=8)):
+                raise ValueError
+        except ValueError:
+            g = _gun_no(x.get("gun"))
+            if g is None:
+                continue
+            dt = bas + timedelta(days=(g - bas.weekday()) % 7)
+        x = {**x, "tarih": dt.isoformat(), "gun": GUN_ADLARI[dt.weekday()].capitalize()}
+        out.append(x)
+    return sorted(out, key=lambda x: x["tarih"])
+
+
+def _gun_paylasimlari(gun=70):
+    """Tarih → o gün paylaşılan sayısı: X profilinden okunan gerçek gönderiler + Ghost'ta 'paylaştım' denenler (aynı gün ikisi de varsa en büyüğü)."""
+    G, P = _gercek_gonderiler(gun), _paylasilan_taslaklar(gun)
+    g1, g2 = collections.Counter(), collections.Counter()
+    for x in G:
+        g1[time.strftime("%Y-%m-%d", time.localtime(x["zaman"]))] += 1
+    for t in P:
+        g2[time.strftime("%Y-%m-%d", time.localtime(t["zaman"]))] += 1
+    return {d: max(g1[d], g2[d]) for d in set(g1) | set(g2)}
+
+
+def elenme_nedeni(temel):
+    """Plan taslağı kapıdan geçmediyse okurun ilk notu (kartta gösterilir)."""
+    try:
+        import kitaplik_onbellek
+        v = kitaplik_onbellek.veri(f"ghost/{str(temel).replace('ghost__', '')}") or {}
+        e = ((v.get("paylasim") or {}).get("elenen") or [{}])[0]
+        return str(e.get("neden") or e.get("not") or "")[:200]
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def _taslak_durumu(temel):
+    """Plandan yazılan taslağın durumu: yok | yaziliyor | hazir | paylasildi | elendi (yazıldı ama okur kapısından geçmedi; yeniden denenebilir)."""
+    if not temel:
+        return "yok"
+    try:
+        import kitaplik_onbellek
+        v = kitaplik_onbellek.veri(f"ghost/{str(temel).replace('ghost__', '')}")
+    except Exception:  # noqa: BLE001
+        v = None
+    if not v:
+        return "yok"
+    p = v.get("paylasim") or {}
+    T = p.get("taslaklar") or []
+    if any(t.get("paylasildi") for t in T):
+        return "paylasildi"
+    if T:
+        return "hazir"
+    if p.get("zaman") or p.get("elenen"):                 # yazım bitti ama kapıdan geçen taslak yok
+        return "elendi"
+    return "yaziliyor" if time.time() - float(v.get("olusturma") or 0) < 1800 else "elendi"   # 30 dk'da bitmediyse takılmıştır
+
+
+def plan(bugun=None):
+    """Haftalık planın gün gün durumu. Döner: {maddeler: [{i, gun, tarih, ne, neden, mecra, durum, taslak, hazirlandi}], ozet}.
+    durum: paylasildi (o gün bir şey paylaşıldı ya da plandan yazılan taslak paylaşıldı) | kacirildi (geçti, paylaşılmadı) | bugun | bekliyor."""
+    bugun = bugun or date.today().isoformat()
+    d = _oku()
+    r = d.get("rapor") or {}
+    H = r.get("hafta") or []
+    if H and not all(x.get("tarih") for x in H):                       # eski not: tarihler yazılır ve SIRALI kaydedilir (madde numaraları buna bağlı)
+        H = _hafta_tarihle(H, date.fromtimestamp(r.get("zaman") or time.time()))
+        r["hafta"] = H; d["rapor"] = r; _yaz(d)
+    if not H:
+        return {"maddeler": [], "ozet": {}}
+    gunluk = _gun_paylasimlari(21)
+    out = []
+    for i, x in enumerate(H):
+        ts = _taslak_durumu(x.get("hazirlandi"))
+        if ts == "paylasildi" or gunluk.get(x["tarih"], 0) > 0 or x.get("paylasildi"):
+            durum = "paylasildi"
+        elif x["tarih"] < bugun:
+            durum = "kacirildi"
+        elif x["tarih"] == bugun:
+            durum = "bugun"
+        else:
+            durum = "bekliyor"
+        out.append({"i": i, "gun": x.get("gun") or GUN_ADLARI[date.fromisoformat(x["tarih"]).weekday()].capitalize(), "tarih": x["tarih"], "ne": x.get("ne") or "",
+                    "neden": x.get("neden") or "", "mecra": x.get("mecra") or "X", "durum": durum, "taslak": ts, "hazirlandi": x.get("hazirlandi") or "",
+                    "elenme": elenme_nedeni(x.get("hazirlandi")) if ts == "elendi" else "", "deneme": int(x.get("deneme") or 0)})
+    n = len(out)
+    oz = {"planlanan": n, "paylasilan": sum(1 for x in out if x["durum"] == "paylasildi"), "kacirilan": sum(1 for x in out if x["durum"] == "kacirildi"),
+          "bugun": next((x for x in out if x["durum"] == "bugun"), None), "bas": out[0]["tarih"], "bit": out[-1]["tarih"],
+          "gunler": {t: c for t, c in gunluk.items() if out[0]["tarih"] <= t <= out[-1]["tarih"]}}
+    return {"maddeler": out, "ozet": oz}
+
+
+def plan_girdisi(x, yeniden=False, not_=""):
+    """Plan maddesi → Ghost'un 'fikir' yoluna girdi (kendi notu gibi; yazıcı stratejiyi ve sesi zaten biliyor). yeniden: önceki deneme okur
+    kapısından geçmedi; okurun notu girdiye eklenir ki aynı yoldan gitmesin."""
+    m = f"{x.get('ne') or ''}"
+    if yeniden:
+        m += "\nÖnceki deneme okur kapısından geçmedi" + (f": {not_}" if not_ else "") + ". Daha somut tek bir ayrıntıdan başla, genel yorum yazma."
+    if x.get("neden"):
+        m += f"\nNeden şimdi: {x['neden']}"
+    if (x.get("mecra") or "").lower().startswith("linkedin"):
+        m += "\n(LinkedIn için, uzun biçim)"
+    elif (x.get("mecra") or "").lower().startswith("zincir"):
+        m += "\n(X zinciri olarak, 2-4 parça)"
+    return m[:580]
+
+
+def plan_isaretle(i, hazirlandi=None, paylasildi=None):
+    d = _oku()
+    H = (d.get("rapor") or {}).get("hafta") or []
+    if not 0 <= i < len(H):
+        raise ValueError("Plan maddesi bulunamadı")
+    if hazirlandi is not None:
+        H[i]["hazirlandi"] = hazirlandi; H[i]["deneme"] = int(H[i].get("deneme") or 0) + 1
+    if paylasildi is not None:
+        H[i]["paylasildi"] = bool(paylasildi)
+    _yaz(d)
+    return H[i]
+
+
+def ritim(hafta=8):
+    """Son N haftanın haftalık gönderi sayısı (pazartesi başlangıçlı) + hedef + süren seri (art arda kaç gün paylaşım var)."""
+    s = strateji()
+    hedef = s.get("haftalik_hedef") or 4
+    gunluk = _gun_paylasimlari(hafta * 7 + 7)
+    bugun = date.today()
+    bas = bugun - timedelta(days=bugun.weekday())
+    H = []
+    for k in range(hafta - 1, -1, -1):
+        hb = bas - timedelta(days=7 * k)
+        n = sum(gunluk.get((hb + timedelta(days=j)).isoformat(), 0) for j in range(7))
+        H.append({"bas": hb.isoformat(), "n": n, "bu": k == 0})
+    seri, g = 0, bugun
+    if not gunluk.get(g.isoformat()):
+        g -= timedelta(days=1)                               # bugün henüz paylaşılmadıysa seri dünden sayılır
+    while gunluk.get(g.isoformat()):
+        seri += 1; g -= timedelta(days=1)
+    return {"haftalar": H, "hedef": hedef, "seri": seri, "bu_hafta": H[-1]["n"] if H else 0}
+
+
+def plan_saati():
+    return PLAN_SAATI.get((strateji().get("cevaplar") or {}).get("saat") or "", 10)
 
 
 if __name__ == "__main__":
