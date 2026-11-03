@@ -592,6 +592,7 @@ def gecmis():
         "paylasim": len((veri.get("paylasim") or {}).get("taslaklar") or []),
         "marka": veri.get("marka", ""), "marka_paket": sorted((veri.get("marka_paket") or {}).get(veri.get("marka", ""), {}).get("secim") or []),
             "katilimcilar": veri.get("katilimcilar", []), "uygulama": veri.get("uygulama", ""), "misafir": veri.get("misafir") or "",
+            "yazi": (lambda y: {"kelime": y.get("kelime"), "okuma_dk": y.get("okuma_dk"), "site": y.get("site")} if y else None)(veri.get("yazi")),
             "karar": len((veri.get("ozet") or {}).get("kararlar") or []), "yapilacak": len((veri.get("ozet") or {}).get("yapilacaklar") or []),
             "ceviriler": list((veri.get("ceviriler") or {}).keys()),
             "atolye": bool(veri.get("atolye") or veri.get("couple")), "koleksiyonlar": veri.get("koleksiyonlar", []),
@@ -829,7 +830,7 @@ def ozet_cikar(temel):
         d = json.loads(t.with_suffix(".json").read_text(encoding="utf-8"))
         with _yz_baglam(d["veri"]):
             o = ozet_modulu.ozet_uret(paragrafla(d["segmentler"], d["veri"]["etiket"]), d["veri"].get("dil", "tr"), hedef,
-                                      log=lambda *_: None, bicim=bicim, istek=str(g.get("not") or "")[:400])
+                                      log=lambda *_: None, bicim=bicim, istek=(("Bu bir video değil, yazılı bir makale: 'video' ya da 'konuşmacı' deme, 'yazı' de. " if d["veri"].get("yazi") else "") + str(g.get("not") or "")[:400]))
         if not o:
             return jsonify({"hata": "Özet üretilemedi."}), 500
         with kilit:

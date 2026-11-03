@@ -1195,7 +1195,7 @@ def secki_maddeleri(log=print):
             kelimeler = [w for w in re.findall(r"\w{5,}", (str(a.get("ad") or "") + " " + str(a.get("not") or "")).lower())][:14]
             if any(w[:6] in metin for w in kelimeler):
                 alan = a["kod"]; break
-        ozet = (str(k.get("metin") or "")[:400] + (f" | Neden önemli: {k['neden']}" if k.get("neden") else "")
+        ozet = (str(k.get("metin") or "")[:400] + (f" | ChatGPT seçkisinin editör notu (kişinin görüşü değil): {k['neden']}" if k.get("neden") else "")
                 + (f" | Kanıt sınırı: {k['kanit_siniri']}" if k.get("kanit_siniri") else ""))[:900]
         out.append({"alan": alan, "kaynak": "ChatGPT seçkisi", "baslik": str(k["baslik"])[:220], "ozet": ozet, "link": link, "resim": "",
                     "zaman": time.time(), "kesif_secki": s.get("tarih") or "bugün", "kanit_siniri": str(k.get("kanit_siniri") or "")[:300]})

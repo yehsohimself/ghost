@@ -2,10 +2,13 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<script src="/static/tema.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Studio</title>
 <meta name="description" content="Video linkinden transkript, özet, çeviri ve altyazılı video. Her şey bu bilgisayarda.">
 <script src="/static/dil.js?v=4"></script>
+<script src="/static/bekleme.js?v=4"></script>
+<script src="/static/soru_karti.js?v=2"></script>
 <link rel="manifest" href="/static/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/static/ikon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -708,7 +711,7 @@
   .card{background:var(--surface)!important;border:1px solid var(--hair)!important;border-radius:var(--r2)!important;box-shadow:var(--shadow)}
   .composer .bar{background:var(--surface)!important;border:1px solid var(--hair2)!important;border-radius:18px!important;box-shadow:var(--shadow);min-height:60px}
   .composer .bar:focus-within{border-color:var(--acc)!important;box-shadow:0 0 0 4px var(--tint)!important}
-  .primary{background:var(--acc)!important;color:var(--acc-ink)!important;border-radius:999px!important;height:42px;padding:0 30px;font:600 14px/1 var(--sans)!important;box-shadow:0 6px 20px var(--tint2)}
+  .primary{background:var(--acc)!important;color:var(--acc-ink)!important;border-radius:999px!important;height:42px;padding:0 30px;font:600 14px/1 var(--sans)!important;box-shadow:none}
   .primary:hover{background:var(--acc-hover)!important}
   .sbtn,.chipb,.kay button,[class*="chip"],.tiny{border-radius:999px!important}
   .sbtn{background:var(--fill)!important;border:0!important;height:32px;padding:0 14px;font-weight:500}
@@ -1212,8 +1215,8 @@
   .thero h1{font:700 clamp(40px,6vw,68px)/1.02 var(--sans);letter-spacing:-.045em;margin:0 0 34px;text-wrap:balance}
   .thero .selam{display:block;font:500 15px/1.4 var(--sans);letter-spacing:0;color:var(--muted);margin-bottom:10px}
   .tkayitb{display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 28px 0 22px;border:0;border-radius:999px!important;background:var(--vurgu);color:#fff;
-    font:600 17px var(--sans);letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 30px -10px rgba(var(--vurgu-rgb),.65);transition:transform .15s,box-shadow .2s,background .2s}
-  .tkayitb:hover{transform:translateY(-1px) scale(1.02);box-shadow:0 14px 34px -10px rgba(var(--vurgu-rgb),.75)}
+    font:600 17px var(--sans);letter-spacing:-.01em;cursor:pointer;box-shadow:none;transition:transform .15s,box-shadow .2s,background .2s}
+  .tkayitb:hover{transform:translateY(-1px) scale(1.02);box-shadow:none}
   .tkayitb:active{transform:scale(.98)}
   .tkayitb .nokta{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.28);transition:border-radius .2s,width .2s,height .2s}
   .tkayitb.kayitta{background:var(--ink);color:var(--bg);font-variant-numeric:tabular-nums;box-shadow:none}
@@ -1320,7 +1323,7 @@
   #tarifKutu .blogm th,#tarifKutu .blogm td{border-bottom:1px solid var(--hair);padding:6px 8px;text-align:left;vertical-align:top}
 
   /* toplantıyla sohbet: sağdan açılan Claude benzeri panel */
-  .sbFab{position:fixed;right:24px;bottom:24px;z-index:30;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px 0 16px;border:0;border-radius:999px;background:var(--vurgu);color:#fff;font:600 15px var(--sans);cursor:pointer;box-shadow:0 10px 30px -10px rgba(var(--vurgu-rgb),.7);transition:transform .15s}
+  .sbFab{position:fixed;right:24px;bottom:24px;z-index:30;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px 0 16px;border:0;border-radius:999px;background:var(--vurgu);color:#fff;font:600 15px var(--sans);cursor:pointer;box-shadow:none;transition:transform .15s}
   .sbFab:hover{transform:translateY(-1px) scale(1.03)}
   .sbFab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
   body.sohbetAcik .sbFab{display:none}
@@ -1343,10 +1346,6 @@
   .sbb .zt:hover{background:var(--vurgu);color:#fff}
   .sbb .sbk{border:0;background:transparent;color:var(--muted);font-size:12px;padding:0;cursor:pointer;opacity:0;transition:opacity .15s}
   .sbb:hover .sbk{opacity:1}
-  .sbb.yaz{display:flex;gap:4px;padding:6px 0}
-  .sbb.yaz i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:sbn 1.2s infinite}
-  .sbb.yaz i:nth-child(2){animation-delay:.15s}.sbb.yaz i:nth-child(3){animation-delay:.3s}
-  @keyframes sbn{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
   .sohbet .sbo{display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 10px}
   .sohbet .sbo button{border:0;background:var(--surface);color:var(--ink);font:500 13px var(--sans);padding:8px 12px;border-radius:999px;cursor:pointer;text-align:left}
   .sohbet .sbo button:hover{background:var(--fill)}
@@ -1371,6 +1370,7 @@
   #kisacaKutu li input{accent-color:var(--vurgu);margin-top:2px;flex:none}
   #kisacaKutu li em{font-style:normal;font-size:12px;color:var(--vurgu);background:rgba(var(--vurgu-rgb),.1);border-radius:999px;padding:1px 8px}
   #kisacaKutu li .zt{border:0;background:var(--fill);color:var(--muted);font:500 11.5px var(--sans);font-variant-numeric:tabular-nums;padding:1px 7px;border-radius:999px!important;cursor:pointer}
+  #kisacaKutu .ktes{display:block;margin:3px 0 0 26px;font-size:12px;color:var(--green,#2e9e5b)} #kisacaKutu .ktes a{color:inherit}
   #kisacaKutu li.bitti span{text-decoration:line-through;color:var(--muted)}
   #kisacaKutu .ksk i{display:block;height:12px;border-radius:6px;background:var(--fill);margin:10px 0;animation:ksk 1.4s ease-in-out infinite}
   @keyframes ksk{50%{opacity:.45}}
@@ -1410,7 +1410,7 @@
   .tpust{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
   .tpust h1{font:700 30px/1.1 var(--sans);letter-spacing:-.03em;margin:0}
   .tpust h1 .selam{display:block;font:500 13px var(--sans);letter-spacing:0;color:var(--muted);margin-bottom:4px}
-  body.urun-note .tkayitb{height:40px;padding:0 18px 0 14px;font-size:14.5px;gap:9px;box-shadow:0 8px 22px -10px rgba(var(--vurgu-rgb),.7)}
+  body.urun-note .tkayitb{height:40px;padding:0 18px 0 14px;font-size:14.5px;gap:9px;box-shadow:none}
   body.urun-note .tkayitb .nokta{width:11px;height:11px;box-shadow:0 0 0 3px rgba(255,255,255,.28)}
   .tpsayi{display:flex;gap:28px;margin:18px 0 10px;font-size:15.5px;flex-wrap:wrap}
   .tpsayi b{font-weight:700;font-variant-numeric:tabular-nums}
@@ -1454,7 +1454,7 @@
   .tkart .avs i.art{color:var(--muted)}
   .tkart .tkis{background:var(--vurgu);color:#fff;font:600 12px var(--sans);padding:4px 10px;border-radius:999px;white-space:nowrap}
   .tkart .tkm{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tkart.sira{background:transparent;box-shadow:inset 0 0 0 1.5px rgba(var(--vurgu-rgb),.55);background-image:radial-gradient(circle at 100% 0,rgba(var(--vurgu-rgb),.12),transparent 60%)}
+  .tkart.sira{background:transparent;box-shadow:inset 0 0 0 1.5px rgba(var(--vurgu-rgb),.55);background-image:none}
   .tkart.sira .tkg{color:var(--vurgu)}
   .tkart.sira p{color:var(--muted)}
   body.urun-note #notBar,body.urun-note #toplantiKayit .kayit,body.urun-note #canliKutu{max-width:none}
@@ -1533,7 +1533,7 @@
   .tkunye .tkbosluk{margin-top:6px;font-size:13px;color:var(--orange,#ff9f0a)}
   .tkunye .tktarih{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
   .tksor{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:50px;margin:20px 0 10px;border:0;border-radius:16px!important;background:var(--vurgu);color:#fff;
-    font:600 16px var(--sans);cursor:pointer;box-shadow:0 10px 26px -12px rgba(var(--vurgu-rgb),.75);transition:transform .15s}
+    font:600 16px var(--sans);cursor:pointer;box-shadow:none;transition:transform .15s}
   .tksor:hover{transform:translateY(-1px)}
   .tksor svg{width:18px;height:18px;fill:#fff}
   .tkdugme{display:flex;gap:8px;flex-wrap:wrap}
@@ -1815,7 +1815,7 @@
 
   /* gönderi: kapalı satır ↔ açık kart */
   .gh-oge{background:var(--surface);border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:box-shadow .2s,opacity .2s}
-  .gh-oge.acik{box-shadow:0 1px 2px rgba(0,0,0,.04),0 14px 40px -28px rgba(var(--vurgu-rgb),.55)}
+  .gh-oge.acik{box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .gh-oge.isliyor{opacity:.55;pointer-events:none}
   #gh .gh-ust{display:flex;align-items:center;gap:8px;width:100%;padding:12px 14px 0 16px;border:0;background:none;text-align:left;cursor:pointer;color:var(--ink2);font:600 12.5px var(--sans)}
   .gh-ust .gh-ik{color:var(--vurgu)}
@@ -2011,8 +2011,7 @@
     --bg:#08080a; --surface:#111114; --surface2:#17171b; --fill:#1d1d22; --fill2:#27272e;
     --ink:#f4f4f6; --ink2:#b4b4bc; --muted:#6c6c76; --hair:rgba(255,255,255,.06); --hair2:rgba(255,255,255,.11);
     --glass:rgba(8,8,10,.8); --shadow:none; --shadow2:0 24px 70px rgba(0,0,0,.7); --green:#30d158; --link:#ff7ab8; --tint:rgba(255,61,154,.12); --tint2:rgba(255,61,154,.2)}
-  html[data-urun="ghost"]:not([data-theme="light"]) body{background:radial-gradient(1000px 520px at 50% -160px,rgba(255,61,154,.11),transparent 70%),
-    radial-gradient(circle at 1px 1px,rgba(255,255,255,.075) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)!important;background-attachment:fixed!important}
+  html[data-urun="ghost"]:not([data-theme="light"]) body{background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.075) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)!important;background-attachment:fixed!important}
   /* Danışman (30 Ekim) */
   .gh-dan-not{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--hair);border-radius:16px;padding:12px 16px;margin:0 0 12px;cursor:pointer;color:var(--ink);font:inherit}
   .gh-dan-not:hover{border-color:var(--vurgu)}.gh-dan-not b{font-size:14px;white-space:nowrap;max-width:48%;overflow:hidden;text-overflow:ellipsis}.gh-dan-not span{flex:1;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gh-dan-not i{color:var(--muted);font-style:normal}
@@ -2053,7 +2052,7 @@
   #gh .gh-hat-svg .bugun .nokta{stroke:var(--vurgu);stroke-dasharray:none;fill:rgba(var(--vurgu-rgb),.12)}
   #gh .gh-hat-svg .bugun .gun{fill:var(--ink)}
   #gh .gh-hat-svg .halo{fill:none;stroke:var(--vurgu);stroke-width:1.2;transform-box:fill-box;transform-origin:center;animation:ghhalo 2.2s ease-out infinite}
-  #gh .gh-hat-svg .paylasildi .nokta{fill:var(--green);stroke:var(--green);stroke-dasharray:none;filter:drop-shadow(0 0 7px rgba(48,209,88,.6))}
+  #gh .gh-hat-svg .paylasildi .nokta{fill:var(--green);stroke:var(--green);stroke-dasharray:none;filter:none}
   #gh .gh-hat-svg .paylasildi .gun{fill:var(--ink)}
   #gh .gh-hat-svg .tik{fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   #gh .gh-hat-svg .kacirildi .nokta{stroke:var(--cizgi);stroke-dasharray:none;fill:var(--bg)}
@@ -2064,8 +2063,8 @@
   #gh .gh-plan-halka b{color:var(--ink);font-size:15px}
   #gh .gh-halka{width:44px;height:44px;transform:rotate(-90deg);flex:none}
   #gh .gh-halka .iz{fill:none;stroke:var(--hair2);stroke-width:3.5}
-  #gh .gh-halka .dolu{fill:none;stroke:var(--vurgu);stroke-width:3.5;stroke-linecap:round;filter:drop-shadow(0 0 5px rgba(var(--vurgu-rgb),.6))}
-  #gh .gh-halka .dolu.tam{stroke:var(--green);filter:drop-shadow(0 0 5px rgba(48,209,88,.6))}
+  #gh .gh-halka .dolu{fill:none;stroke:var(--vurgu);stroke-width:3.5;stroke-linecap:round;filter:none}
+  #gh .gh-halka .dolu.tam{stroke:var(--green);filter:none}
   #gh .gh-halka.canli .dolu{animation:ghhalka 1.1s cubic-bezier(.2,.8,.2,1) both}
   #gh .gh-plan-bugun{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-top:8px;padding:12px 14px;border-radius:14px;border:1px solid rgba(var(--vurgu-rgb),.3);background:linear-gradient(135deg,rgba(var(--vurgu-rgb),.1),transparent 70%)}
   #gh .gh-plan-bugun.sonra{border-style:dashed;border-color:var(--hair2);background:none}
@@ -2080,10 +2079,10 @@
   #gh .gh-radar .iz{fill:none;stroke:var(--cizgi);stroke-width:1}
   #gh .gh-radar .iz:last-of-type{stroke-dasharray:none}
   #gh .gh-radar .eksen{stroke:var(--cizgi);stroke-width:1;stroke-dasharray:2 3}
-  #gh .gh-radar .deger{fill:rgba(var(--vurgu-rgb),.16);stroke:var(--vurgu);stroke-width:1.6;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0;filter:drop-shadow(0 0 12px rgba(var(--vurgu-rgb),.45))}
+  #gh .gh-radar .deger{fill:rgba(var(--vurgu-rgb),.16);stroke:var(--vurgu);stroke-width:1.6;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0;filter:none}
   #gh .gh-radar.canli .deger{animation:ghciz 1.2s cubic-bezier(.2,.8,.2,1) both}
-  #gh .gh-radar .uc{fill:var(--vurgu);stroke:var(--bg);stroke-width:2;filter:drop-shadow(0 0 6px rgba(var(--vurgu-rgb),.8))}
-  #gh .gh-radar .uc.dusuk{fill:#FF9500;filter:drop-shadow(0 0 6px rgba(255,149,0,.7))}
+  #gh .gh-radar .uc{fill:var(--vurgu);stroke:var(--bg);stroke-width:2;filter:none}
+  #gh .gh-radar .uc.dusuk{fill:#FF9500;filter:none}
   #gh .gh-radar .uc.yok{fill:var(--cizgi);filter:none}
   #gh .gh-radar.canli .uc{animation:ghbelir .5s both;animation-delay:calc(.7s + var(--i) * 60ms)}
   #gh .gh-radar .etk{font:600 11.5px var(--sans);fill:var(--muted)}
@@ -2092,7 +2091,7 @@
   #gh .gh-puan .gh-genel{display:inline-flex;align-items:center;gap:10px}
   #gh .gh-cizgi polyline{fill:none;stroke:var(--vurgu);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
   #gh .gh-cizgi.canli polyline{animation:ghciz 1s ease-out both}
-  #gh .gh-cizgi circle{fill:var(--vurgu);filter:drop-shadow(0 0 5px rgba(var(--vurgu-rgb),.8))}
+  #gh .gh-cizgi circle{fill:var(--vurgu);filter:none}
   #gh .gh-ritim-sarma{display:grid;gap:14px;margin-top:14px}#gh .gh-ritim-sarma>div>.gh-ara{margin-bottom:4px}#gh .gh-ritim-sarma>div:last-child{max-width:460px}
   #gh .gh-ritim{display:block;width:100%;height:auto;overflow:visible}
   #gh .gh-ritim .hedef{stroke:var(--vurgu);stroke-width:1;stroke-dasharray:3 4;opacity:.7}
@@ -2100,7 +2099,7 @@
   #gh .gh-ritim .hedef-etk{fill:var(--vurgu)}
   #gh .gh-ritim .n{font:700 11px var(--sans);fill:var(--ink)}
   #gh .gh-ritim rect{fill:color-mix(in srgb,var(--vurgu) 35%,var(--hair2));transform-box:fill-box;transform-origin:bottom}
-  #gh .gh-ritim .tam rect{fill:var(--vurgu);filter:drop-shadow(0 0 8px rgba(var(--vurgu-rgb),.5))}
+  #gh .gh-ritim .tam rect{fill:var(--vurgu);filter:none}
   #gh .gh-ritim .bu rect{stroke:var(--vurgu);stroke-width:1.2;stroke-dasharray:3 2}
   #gh .gh-ritim.canli rect{animation:ghbuyu .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 60ms)}
   #gh .gh-ritim.canli .n{animation:ghbelir .4s both;animation-delay:calc(.5s + var(--i) * 60ms)}
@@ -2118,8 +2117,8 @@
   #gh .gh-serit .kerte-etk{font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;fill:var(--muted)}
   #gh .gh-serit .olay{cursor:pointer}
   #gh .gh-serit .olay .nokta{fill:var(--surface);stroke:var(--vurgu);stroke-width:1.6}
-  #gh .gh-serit .olay.yakin .nokta{fill:var(--vurgu);filter:drop-shadow(0 0 8px rgba(var(--vurgu-rgb),.7))}
-  #gh .gh-serit .olay.hazir .nokta{fill:var(--green);stroke:var(--green);filter:drop-shadow(0 0 7px rgba(48,209,88,.55))}
+  #gh .gh-serit .olay.yakin .nokta{fill:var(--vurgu);filter:none}
+  #gh .gh-serit .olay.hazir .nokta{fill:var(--green);stroke:var(--green);filter:none}
   #gh .gh-serit .olay .halo{fill:none;stroke:var(--vurgu);stroke-width:1;opacity:0}
   #gh .gh-serit .olay.yakin .halo{transform-box:fill-box;transform-origin:center;animation:ghhalo 2.4s ease-out infinite}
   #gh .gh-serit .olay .bag{stroke:var(--cizgi);stroke-width:1}
@@ -2157,14 +2156,14 @@
   #gh{--cizgi:color-mix(in srgb,var(--ink) 20%,transparent);--parilti:rgba(var(--vurgu-rgb),.55)}
   #gh :is(.gh-oge,.gh-kutu,.gh-sayfa-kart,.gh-yaz,.gh-bos,.gh-katla,.gh-haz){border:1px solid var(--hair2);box-shadow:none;border-radius:16px;
     background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 2.5%,transparent),transparent 60%),var(--surface)}
-  #gh .gh-oge.acik{border-color:rgba(var(--vurgu-rgb),.38);box-shadow:0 0 0 1px rgba(var(--vurgu-rgb),.1),0 30px 80px -42px var(--parilti)}
+  #gh .gh-oge.acik{border-color:rgba(var(--vurgu-rgb),.38);box-shadow:0 0 0 1px rgba(var(--vurgu-rgb),.1)}
   #gh .gh-yaz:focus-within{border-color:rgba(var(--vurgu-rgb),.45);box-shadow:0 0 0 3px rgba(var(--vurgu-rgb),.12)}
-  #gh .ghb.ana{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 10px 30px -10px var(--parilti)}
+  #gh .ghb.ana{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
   #gh .ghb.ana:disabled{box-shadow:none}
   #gh .ghb.vurgu{color:var(--vurgu)}
   /* mono küçük etiketler ve iki tonlu başlık */
   #gh .gh-etk{display:inline-flex;align-items:center;gap:7px;margin:0;font:600 10.5px/1.5 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-  #gh .gh-etk i{width:6px;height:6px;border-radius:50%;background:var(--vurgu);box-shadow:0 0 10px var(--vurgu);flex:none}
+  #gh .gh-etk i{width:6px;height:6px;border-radius:50%;background:var(--vurgu);box-shadow:none;flex:none}
   #gh .gh-ust .gh-etk{color:var(--vurgu)}
   .gh-bas{align-items:flex-start;margin-bottom:20px}
   .gh-bas h2{font-size:31px!important;letter-spacing:-.04em;line-height:1.08}
@@ -2177,8 +2176,8 @@
   .gh-zaman::before{content:"";position:absolute;left:10px;top:24px;bottom:24px;border-left:1px dashed var(--cizgi)}
   .gh-zaman>*{position:relative}
   .gh-zaman>*::before{content:"";position:absolute;left:-25px;top:17px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid var(--cizgi);box-sizing:border-box}
-  .gh-zaman>.gh-oge.acik::before{background:var(--vurgu);border-color:var(--vurgu);box-shadow:0 0 0 4px rgba(var(--vurgu-rgb),.16),0 0 16px var(--vurgu)}
-  .gh-zaman>.gh-ok::before{background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(48,209,88,.5)}
+  .gh-zaman>.gh-oge.acik::before{background:var(--vurgu);border-color:var(--vurgu);box-shadow:0 0 0 4px rgba(var(--vurgu-rgb),.16)}
+  .gh-zaman>.gh-ok::before{background:var(--green);border-color:var(--green);box-shadow:none}
   #gh .gh-ok{border:1px solid rgba(48,209,88,.18);background:rgba(48,209,88,.06)}
   /* sol gezinme: düğüm şeması */
   @media (min-width:1080px){
@@ -2186,8 +2185,8 @@
     .gh-sek::before{content:"";position:absolute;left:23px;top:22px;bottom:22px;border-left:1px dashed var(--cizgi)}
     #gh .gh-sek button{position:relative;border:1px solid transparent;background:transparent}
     #gh .gh-sek button svg{background:var(--bg);border-radius:6px;padding:1px;box-sizing:content-box}
-    #gh .gh-sek button[aria-selected="true"]{background:var(--surface);border-color:var(--hair2);box-shadow:0 18px 50px -34px var(--parilti)}
-    #gh .gh-sek button[aria-selected="true"] svg{filter:drop-shadow(0 0 6px var(--vurgu))}
+    #gh .gh-sek button[aria-selected="true"]{background:var(--surface);border-color:var(--hair2);box-shadow:none}
+    #gh .gh-sek button[aria-selected="true"] svg{filter:none}
   }
   /* kart içi sadeleştirilmiş parçalar */
   .gh-ust .ad{color:var(--ink2)}
@@ -2207,7 +2206,7 @@
   .gh-xk-a:hover{color:var(--vurgu)}
   #gh .gh-alt .ghb.ikon{position:relative}
   .gh-rozet{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:#FF9500}
-  .gh-nokta.pembe{background:var(--vurgu);box-shadow:0 0 8px var(--vurgu)}
+  .gh-nokta.pembe{background:var(--vurgu);box-shadow:none}
   .gh-yorum{border:1px solid var(--hair2);background:color-mix(in srgb,var(--ink) 2%,transparent)}
   .gh-yorum small.soru{color:var(--vurgu);font-weight:600;font-size:12.5px;line-height:1.45;margin-bottom:4px}
   #gh .gh-alt .ghb svg circle{fill:currentColor;stroke:none}
@@ -2267,7 +2266,7 @@
   #ghEl{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
     display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
   #ghEl .el-kart{width:min(640px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--hair2);border-radius:20px;padding:20px 20px 16px;
-    box-shadow:0 30px 80px -40px rgba(var(--vurgu-rgb,255,61,154),.55)}
+    box-shadow:none}
   #ghEl .el-ust{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:12px}
   #ghEl .el-ust .sag{margin-left:auto;display:flex;gap:6px;align-items:center}
   #ghEl .el-cubuk{height:3px;border-radius:2px;background:var(--hair2);margin:-6px 0 14px;overflow:hidden}#ghEl .el-cubuk i{display:block;height:100%;background:var(--vurgu);transition:width .25s}
@@ -2297,12 +2296,12 @@
     .gh-harita path{fill:none;stroke:var(--cizgi);stroke-width:1;stroke-dasharray:2 4;animation:ghakis 1.6s linear infinite}
     @keyframes ghakis{to{stroke-dashoffset:-12}}
     @media (prefers-reduced-motion:reduce){.gh-harita path{animation:none}}
-    .gh-h-merkez{position:absolute;left:50%;top:14px;width:44px;height:44px;margin-left:-22px;border-radius:13px;box-shadow:0 0 0 6px rgba(var(--vurgu-rgb),.08),0 0 34px rgba(var(--vurgu-rgb),.65)}
+    .gh-h-merkez{position:absolute;left:50%;top:14px;width:44px;height:44px;margin-left:-22px;border-radius:13px;box-shadow:0 0 0 6px rgba(var(--vurgu-rgb),.08)}
     .gh-h-merkez img{width:100%;height:100%;border-radius:13px;display:block}
     #gh .gh-h-dugum{position:absolute;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:9px;
       border:1px solid var(--hair2);background:var(--surface);color:var(--ink2);font:600 11.5px var(--sans);cursor:pointer;white-space:nowrap}
     #gh .gh-h-dugum:hover{border-color:rgba(var(--vurgu-rgb),.45);color:var(--ink)}
-    .gh-h-dugum i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+    .gh-h-dugum i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:none}
     .gh-h-dugum b{font:600 10.5px var(--mono);color:var(--muted)}
     .gh-harita>.gh-etk{position:absolute;left:0;right:0;bottom:0;justify-content:center}
   }
@@ -2326,36 +2325,35 @@
     --ink:#f4f4f6; --ink2:#b4b4bc; --muted:#6c6c76; --hair:rgba(255,255,255,.06); --hair2:rgba(255,255,255,.11);
     --glass:rgba(8,8,10,.78); --shadow:none; --shadow2:0 24px 70px rgba(0,0,0,.7); --green:#30d158; --orange:#ffb340; --red:#ff6961; --key:#1d1d22}
   html[data-urun] body{--mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;--cizgi:color-mix(in srgb,var(--ink) 20%,transparent);--parilti:rgba(var(--vurgu-rgb),.55)}
-  html[data-urun]:not([data-theme="light"]) body{background:radial-gradient(1100px 560px at 50% -180px,rgba(var(--vurgu-rgb),.12),transparent 70%),
-    radial-gradient(circle at 1px 1px,rgba(255,255,255,.075) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)!important;background-attachment:fixed!important}
+  html[data-urun]:not([data-theme="light"]) body{background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.075) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)!important;background-attachment:fixed!important}
   html[data-urun][data-theme="light"] body{background:radial-gradient(circle at 1px 1px,rgba(0,0,0,.07) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)!important;background-attachment:fixed!important}
   html[data-urun]:not([data-theme="light"]) .nav{background:rgba(8,8,10,.72)!important;border-bottom:1px solid var(--hair)!important;backdrop-filter:saturate(1.4) blur(18px)}
   .pr-etk{display:inline-flex;align-items:center;gap:7px;font:600 10.5px/1.5 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-  .pr-etk i{width:6px;height:6px;border-radius:50%;background:var(--vurgu);box-shadow:0 0 10px var(--vurgu);flex:none;font-style:normal}
+  .pr-etk i{width:6px;height:6px;border-radius:50%;background:var(--vurgu);box-shadow:none;flex:none;font-style:normal}
   .pr-gri{color:var(--muted)}
   /* birincil düğmeler: ürün renginde, hafif ışıltılı */
-  html[data-urun] .primary:not(:disabled){background:var(--vurgu)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 10px 30px -10px var(--parilti)!important}
+  html[data-urun] .primary:not(:disabled){background:var(--vurgu)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)!important}
   html[data-urun]:not([data-theme="light"]) .primary:disabled{background:var(--fill)!important;color:var(--muted)!important;box-shadow:none!important}
   html[data-urun]:not([data-theme="light"]) :is(.sbtn,.tiny.kutu){background:var(--fill)!important;color:var(--ink)!important}
   html[data-urun]:not([data-theme="light"]) .tog[aria-checked="true"]{background:var(--vurgu)!important}
-  html[data-urun] .sbtn.blue,html[data-urun] .sbtn.blue:hover{background:var(--vurgu)!important;color:#fff!important;box-shadow:0 8px 24px -10px var(--parilti)!important}
+  html[data-urun] .sbtn.blue,html[data-urun] .sbtn.blue:hover{background:var(--vurgu)!important;color:#fff!important;box-shadow:none!important}
   html[data-urun]:not([data-theme="light"]) .pop{background:#141418;border-color:var(--hair2)}
   html[data-urun]:not([data-theme="light"]) dialog.sheet{background:#121215;border:1px solid var(--hair2)}
   html[data-urun]:not([data-theme="light"]) .toast{background:#1b1b20;color:var(--ink);border:1px solid var(--hair2)}
   /* ---- v20 · Transcript ana sayfası: tanıtım filmi ("No button.", REC kapsülü, düğüm şeması, "Who does what. By when.") ---- */
   body.urun-note .tprofil{gap:28px;align-items:center;padding:26px 8px 30px}
-  body.urun-note .tpav{width:76px;height:76px;padding:0;border-radius:22px;background:none;box-shadow:0 0 0 8px rgba(var(--vurgu-rgb),.07),0 0 48px rgba(var(--vurgu-rgb),.55)}
+  body.urun-note .tpav{width:76px;height:76px;padding:0;border-radius:22px;background:none;box-shadow:0 0 0 8px rgba(var(--vurgu-rgb),.07)}
   body.urun-note .tpav img{border:0;border-radius:22px}
-  body.urun-note.tSirkette .tpav{box-shadow:0 0 0 8px color-mix(in srgb,var(--srenk,#888) 14%,transparent),0 0 40px color-mix(in srgb,var(--srenk,#888) 45%,transparent)}
+  body.urun-note.tSirkette .tpav{box-shadow:0 0 0 8px color-mix(in srgb,var(--srenk,#888) 14%,transparent)}
   body.urun-note .tpust{gap:14px}
   body.urun-note .tpust h1{font:700 clamp(30px,3.6vw,42px)/1.05 var(--sans);letter-spacing:-.045em;flex-basis:100%;margin:0 0 4px}
   body.urun-note .tpust h1 .selam{font:600 10.5px/1.5 var(--mono);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px}
   body.urun-note .tkayitb{height:46px;padding:0 20px 0 16px;gap:12px;font:600 14.5px var(--sans);background:rgba(var(--vurgu-rgb),.1);color:var(--ink);
-    box-shadow:inset 0 0 0 1px rgba(var(--vurgu-rgb),.55),0 0 28px -6px rgba(var(--vurgu-rgb),.55)}
+    box-shadow:inset 0 0 0 1px rgba(var(--vurgu-rgb),.55)}
   body.urun-note .tkayitb::after{content:"";width:58px;height:18px;opacity:.9;
     background:repeating-linear-gradient(90deg,var(--vurgu) 0 2px,transparent 2px 5px);-webkit-mask:linear-gradient(180deg,transparent 0,#000 30%,#000 70%,transparent 100%),
     radial-gradient(ellipse at center,#000 40%,transparent 75%);-webkit-mask-composite:source-in;mask-composite:intersect}
-  body.urun-note .tkayitb .nokta{width:10px;height:10px;background:var(--vurgu);box-shadow:0 0 0 3px rgba(var(--vurgu-rgb),.25),0 0 10px var(--vurgu)}
+  body.urun-note .tkayitb .nokta{width:10px;height:10px;background:var(--vurgu);box-shadow:0 0 0 3px rgba(var(--vurgu-rgb),.25)}
   body.urun-note .tkayitb:hover{background:rgba(var(--vurgu-rgb),.16)}
   body.urun-note .tkayitb.kayitta{background:rgba(var(--vurgu-rgb),.16);color:var(--ink)}
   body.urun-note .tkayitb.kayitta::after{animation:dalga 1.2s linear infinite}
@@ -2368,8 +2366,8 @@
   body.urun-note .tvurgu::before{content:"";position:absolute;left:40px;right:40px;top:41px;border-top:1px dashed var(--cizgi);pointer-events:none}
   body.urun-note .tvurgu button{position:relative;z-index:1}
   body.urun-note .tvurgu .hal{width:62px;height:62px;box-shadow:0 0 0 4px var(--bg),0 0 0 5px var(--hair2)}
-  body.urun-note .tvurgu button:hover .hal{box-shadow:0 0 0 4px var(--bg),0 0 0 5px rgba(var(--vurgu-rgb),.6),0 0 24px rgba(var(--vurgu-rgb),.35)}
-  body.urun-note .tvurgu button.on .hal{box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--vurgu),0 0 26px rgba(var(--vurgu-rgb),.45)}
+  body.urun-note .tvurgu button:hover .hal{box-shadow:0 0 0 4px var(--bg), 0 0 0 5px rgba(var(--vurgu-rgb),.6)}
+  body.urun-note .tvurgu button.on .hal{box-shadow:0 0 0 4px var(--bg), 0 0 0 6px var(--vurgu)}
   body.urun-note .tvurgu button{width:88px}
   body.urun-note .tvurgu small{font:600 11px var(--mono);letter-spacing:.02em;color:var(--ink2);max-width:88px}
   /* söz kartı ve ızgara */
@@ -2421,12 +2419,12 @@
     border:1px solid var(--hair2);box-shadow:none}
   body.urun-note .tkart{border-radius:18px}
   body.urun-note .tkart::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,var(--vurgu)),transparent);opacity:.8}
-  body.urun-note .tkart:hover{border-color:rgba(var(--vurgu-rgb),.35);box-shadow:0 26px 60px -36px rgba(var(--vurgu-rgb),.55);transform:translateY(-2px)}
+  body.urun-note .tkart:hover{border-color:rgba(var(--vurgu-rgb),.35);box-shadow:none;transform:translateY(-2px)}
   body.urun-note .tkart .tku{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase}
   body.urun-note .tkart .tkg{font:600 10.5px var(--mono);letter-spacing:.08em;color:var(--ink2)}
   body.urun-note .tkart .tkg::before{content:"●";color:var(--c,var(--vurgu));margin-right:6px;font-size:8px;vertical-align:1px}
   html[data-urun]:not([data-theme="light"]) body.urun-note .tkart .avs i{background:var(--fill);box-shadow:0 0 0 2px var(--surface)}
-  body.urun-note .tkart.sira{border:1px dashed rgba(var(--vurgu-rgb),.55)!important;background:radial-gradient(circle at 100% 0,rgba(var(--vurgu-rgb),.16),transparent 60%),var(--surface)!important}
+  body.urun-note .tkart.sira{border:1px dashed rgba(var(--vurgu-rgb),.55)!important;background:var(--surface)!important}
   @media (max-width:760px){
     body.urun-note .tprofil{flex-direction:row;align-items:flex-start;gap:16px;padding:16px 4px 22px}
     body.urun-note .tpav{width:52px;height:52px;border-radius:16px}body.urun-note .tpav img{border-radius:16px}
@@ -2448,8 +2446,8 @@
   @media (prefers-reduced-motion:reduce){.st-cizgi path.on{animation:none}}
   .st-sol,.st-sag{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;min-width:0}
   .st-merkez{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
-  .st-kapak{width:168px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid rgba(var(--vurgu-rgb),.55);box-shadow:0 0 0 6px rgba(var(--vurgu-rgb),.08),0 0 44px rgba(var(--vurgu-rgb),.5)}
-  .st-logo img{display:block;width:58px;height:58px;border-radius:17px;box-shadow:0 0 0 7px rgba(var(--vurgu-rgb),.08),0 0 44px rgba(var(--vurgu-rgb),.6)}
+  .st-kapak{width:168px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid rgba(var(--vurgu-rgb),.55);box-shadow:0 0 0 6px rgba(var(--vurgu-rgb),.08)}
+  .st-logo img{display:block;width:58px;height:58px;border-radius:17px;box-shadow:0 0 0 7px rgba(var(--vurgu-rgb),.08)}
   #stHarita .st-d{display:flex!important;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 13px!important;border-radius:14px!important;border:1px solid var(--hair2)!important;
     background:var(--surface)!important;color:var(--ink)!important;box-shadow:none!important;cursor:pointer;font:inherit;height:auto!important;min-height:0!important;transition:border-color .2s,box-shadow .2s,opacity .3s,transform .15s}
   #stHarita .st-d:hover{border-color:rgba(var(--vurgu-rgb),.4)!important}
@@ -2459,7 +2457,7 @@
   .st-d span{flex:1;min-width:0}.st-d b{display:block;font:600 13.5px/1.3 var(--sans)}
   .st-d small{display:block;font-size:11.5px;line-height:1.35;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .st-d em{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:600 13px/1 var(--sans);font-style:normal;color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair2)}
-  #stHarita .st-d.on{border-color:rgba(var(--vurgu-rgb),.6)!important;box-shadow:0 0 0 1px rgba(var(--vurgu-rgb),.12),0 16px 40px -26px var(--parilti)!important}
+  #stHarita .st-d.on{border-color:rgba(var(--vurgu-rgb),.6)!important;box-shadow:0 0 0 1px rgba(var(--vurgu-rgb),.12)!important}
   .st-d.on .st-ik,.st-d.on em{background:var(--vurgu);color:#fff;box-shadow:none}
   #stHarita .st-d.kilit{cursor:default}
   .st-harita.bos{opacity:.5}
@@ -2514,11 +2512,11 @@
   /* ---- v20 · ortak: kitaplık kartları, bölüm başlıkları, iş kartı ---- */
   html[data-urun] .card.hc{border:1px solid var(--hair2)!important;border-radius:16px!important;box-shadow:none!important;overflow:hidden;
     background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 2.5%,transparent),transparent 50%),var(--surface)!important;transition:border-color .2s,box-shadow .2s,transform .2s}
-  html[data-urun] .card.hc:hover{border-color:rgba(var(--vurgu-rgb),.4)!important;box-shadow:0 26px 60px -38px var(--parilti)!important;transform:translateY(-2px)}
+  html[data-urun] .card.hc:hover{border-color:rgba(var(--vurgu-rgb),.4)!important;box-shadow:none!important;transform:translateY(-2px)}
   html[data-urun] .card.hc .mt{font:600 10.5px/1.6 var(--mono)!important;letter-spacing:.05em;color:var(--muted)}
   html[data-urun] .card.hc .kal{display:inline-flex!important;width:auto!important;height:auto!important;padding:1px 7px!important;margin:0 6px 0 0!important;border-radius:6px!important;
     font:600 10px/1.6 var(--mono)!important;letter-spacing:.06em;text-transform:uppercase;background:rgba(var(--vurgu-rgb),.14)!important;color:var(--vurgu)!important;box-shadow:none!important}
-  html[data-urun] .card.hc .new{font:600 10px var(--mono)!important;letter-spacing:.08em;text-transform:uppercase;background:var(--vurgu)!important;color:#fff!important;box-shadow:0 0 14px var(--parilti)}
+  html[data-urun] .card.hc .new{font:600 10px var(--mono)!important;letter-spacing:.08em;text-transform:uppercase;background:var(--vurgu)!important;color:#fff!important;box-shadow:none}
   html[data-urun] .card.hc .dur{font:600 10.5px var(--mono)!important;background:rgba(0,0,0,.6)!important;color:#fff!important;backdrop-filter:blur(6px)}
   html[data-urun] #libMeta,html[data-urun] .sh+.hint{font:600 10.5px/1.6 var(--mono)!important;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   html[data-urun] .sh h2{letter-spacing:-.045em!important}
@@ -2534,7 +2532,7 @@
   html[data-urun] #doc .toolbar .lbl,html[data-urun] #doc .ozet h4,html[data-urun] #doc .ozet .ktop h4{font:600 10.5px/1.6 var(--mono)!important;letter-spacing:.08em!important;text-transform:uppercase!important;color:var(--muted)!important}
   html[data-urun] #doc .chips .chip{font:600 10.5px/1.6 var(--mono)!important;letter-spacing:.04em;border:1px solid var(--hair2)!important;background:transparent!important}
   html[data-urun] #doc .ozet{border:1px solid var(--hair2)!important;box-shadow:none!important}
-  html[data-urun] .job,html[data-urun] #jobs>.card{border:1px solid var(--hair2)!important;box-shadow:0 30px 70px -50px var(--parilti)!important}
+  html[data-urun] .job,html[data-urun] #jobs>.card{border:1px solid var(--hair2)!important;box-shadow:none!important}
   /* ---- v21 · tek mono etiket kuralı: her ekranda yalnız selamlama (ya da Ghost'ta LinkedIn ayracı) mono; başlıklar, rozetler, açıklamalar düz yazı ---- */
   html[data-urun] #doc .ozet h4,html[data-urun] #doc .ozet .ktop h4,html[data-urun] .tsesli h4{font:700 17px/1.3 var(--sans)!important;letter-spacing:-.01em!important;text-transform:none!important;color:var(--ink)!important}
   html[data-urun] #doc .toolbar .lbl{font:500 12.5px/1.6 var(--sans)!important;letter-spacing:0!important;text-transform:none!important}
@@ -2868,8 +2866,8 @@
   <div class="row"><div class="l">Kendini geliştirme<small>Her pazartesi Ghost haftasını ölçer, ayarlarını kendisi düzeltir (geri alınabilir) ve X, Claude ve benzeri araçlardaki gelişmeleri tarar. Kod gerektiren değişiklikleri size sorar.</small></div><button class="tog" id="ayGelisim" role="switch" aria-checked="true" type="button" aria-label="Kendini geliştirme"></button></div>
   <div class="row"><div class="l">Telefonda tek kart<small id="ayGhTekNot"></small></div><button class="sbtn" id="ayGhTekKopyala" type="button">Adresi kopyala</button></div>
   <div class="row"><div class="l">Takip edilen kanallarda otomatik<small>Yeni videolar yazıya dökülünce paylaşmaya değer fikirler kendiliğinden aranır (en çok 3).</small></div><button class="tog" id="ayPyOto" role="switch" aria-checked="true" type="button"></button></div>
-  <div class="row"><div class="l">Yazım tarzınız<small>Taslaklar bu tarife göre yazılır; dilediğiniz gibi düzenleyin.</small></div><textarea id="ayPyTarz" rows="4" style="width:280px;max-width:55%;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
-  <div class="row"><div class="l">Örnek paylaşımlarınız<small>Kendi yazdığınız birkaç gönderiyi yapıştırın; aralarına tek başına --- satırı koyun (gönderi içindeki boş satırlar korunur). Ses ve ritim buradan öğrenilir.</small></div><textarea id="ayPyOrnek" rows="5" placeholder="Bir gönderi…&#10;---&#10;Bir gönderi daha…" style="width:280px;max-width:55%;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea></div>
+  <div class="row" style="flex-wrap:wrap"><div class="l">Yazım tarzınız<small>Taslaklar bu tarife göre yazılır; dilediğiniz gibi düzenleyin.</small></div><div style="flex:1 1 100%;width:100%;margin-top:8px"><textarea id="ayPyTarz" rows="4" style="width:100%;box-sizing:border-box;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:6px;flex-wrap:wrap"><small id="ayPyTarzDurum" aria-live="polite" style="flex:1;min-width:100px;color:var(--muted);font-size:12px"></small><button class="sbtn" id="ayPyTarzKaydet" type="button">Kaydet</button></div></div></div>
+  <div class="row" style="flex-wrap:wrap"><div class="l">Örnek paylaşımlarınız<small>Kendi yazdığınız birkaç gönderiyi yapıştırın; aralarına tek başına --- satırı koyun (gönderi içindeki boş satırlar korunur). Ses ve ritim buradan öğrenilir.</small></div><div style="flex:1 1 100%;width:100%;margin-top:8px"><textarea id="ayPyOrnek" rows="5" placeholder="Bir gönderi…&#10;---&#10;Bir gönderi daha…" style="width:100%;box-sizing:border-box;font:inherit;font-size:13px;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;background:var(--fill);color:var(--ink);resize:vertical"></textarea><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:6px;flex-wrap:wrap"><small id="ayPyOrnekDurum" aria-live="polite" style="flex:1;min-width:100px;color:var(--muted);font-size:12px"></small><button class="sbtn" id="ayPyOrnekKaydet" type="button">Kaydet</button></div></div></div>
   <h4 class="ayh">Paylaşım</h4>
   <div class="row"><div class="l">Aynı ağdaki cihazlara aç<small id="ayAgNot">Aynı Wi‑Fi’daki telefon ve bilgisayarlar siteyi kullanabilir.</small></div><button class="tog" id="ayAg" role="switch" aria-checked="false" type="button"></button></div>
   <div class="row" id="ayUygulamaRow"><div class="l">Telefonda uygulama gibi kullan<small id="ayUygulamaNot"></small></div><button class="sbtn" id="ayTelefonKopyala" type="button">Adresi kopyala</button></div>
@@ -2890,7 +2888,7 @@
   <div class="sbo" id="sbOneri"></div>
   <form class="sbg" id="sbForm"><textarea id="sbGir" rows="1" placeholder="Bir şey sorun… (ör. bütçe için ne dendi?)" aria-label="Soru"></textarea><button type="submit" id="sbGonder" aria-label="Gönder"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></form>
 </aside>
-<dialog class="sheet panel bekdlg" id="bekDlg"><div class="ktop"><h4>Sizden beklenenler</h4><button type="button" class="tiny" onclick="this.closest('dialog').close()">Kapat</button></div><div class="tsoz" id="bekIc"></div></dialog>
+<dialog class="sheet panel bekdlg" id="bekDlg"><div class="ktop"><h4>Sizden beklenenler</h4><button type="button" class="tiny" id="isKanitBtn" title="Asana ve e-postalarınızda bu işlerin yapıldığına dair kanıt arar; bulunanları kanıtıyla kapatır" onclick="isKanitKontrol(this)">Yapılanları kontrol et</button><button type="button" class="tiny" onclick="this.closest('dialog').close()">Kapat</button></div><div class="tsoz" id="bekIc"></div></dialog>
 <dialog class="sheet" id="sheet"><h4 id="shT"></h4><p id="shP"></p><div class="bt"><button id="shNo" type="button">Vazgeç</button><button id="shYes" type="button" class="danger">Sil</button></div></dialog>
 <dialog class="sheet oynat" id="oynat"><div id="oynatIc"></div><div class="ttl" id="oynatT"></div><div class="mt" id="oynatM"></div><div class="bt"><a class="sbtn" id="oynatKaydet" download>Tarayıcıya indir</a><button class="sbtn" id="oynatFinder" type="button">Finder</button><button id="oynatKapat" type="button">Kapat</button></div></dialog>
 
@@ -2965,14 +2963,7 @@ const dilBayrak = k => (BAYRAK[k] ? BAYRAK[k] + ' ' : '') + dilAdi(k);
 
 /* tema: sistem → açık → koyu */
 const ICO = { sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', moon:'<path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1C13 3 12.5 3 12 3z"/>', auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/>' };
-function applyTheme(t){ if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
-  $('#themeIco').innerHTML = ICO[t === 'dark' ? 'sun' : t === 'light' ? 'moon' : 'auto']; $('#theme').setAttribute('aria-label', t === 'dark' ? 'Açık görünüme geç' : t === 'light' ? 'Sistem görünümüne dön' : 'Koyu görünüme geç'); }
-if (!store.get('te_tema')){ store.set('tema', 'light'); store.set('te_tema', 1); }
-// Ghost tanıtım filmlerinin koyu görsel dilini kullanır (2026-10-22): teması ayrı tutulur, varsayılanı koyu; diğer ürünler eskisi gibi
-// v20 (2026-10-22): bütün ürünler tanıtım filmlerinin koyu dilini kullanır; yeni anahtar, varsayılan koyu (Ghost'ta önceki seçim taşınır)
-const TEMA_ANAHTAR = 'tema_v20';
-applyTheme(store.get(TEMA_ANAHTAR, store.get('tema_ghost', 'dark')));
-$('#theme').onclick = () => { const cur = document.documentElement.dataset.theme || ''; const next = cur === '' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark') : cur === 'light' ? 'dark' : ''; applyTheme(next); store.set(TEMA_ANAHTAR, next); };
+Tema.bagla($('#theme'));
 
 /* kontroller (ayarlar hatırlanır; işlem modu her açılışta Yazıya dök) */
 Object.assign(state, store.get('ayar', {}));
@@ -3113,7 +3104,7 @@ async function onizle(link){
     const d = await r.json();
     if (!r.ok){
       const giris = d.hata === 'giris';
-      pv.innerHTML = `<div class="ph still"></div><div style="min-width:0"><div class="t" style="color:var(--muted);font-weight:500">${giris ? 'Bu site giriş istiyor.' : 'Bilgiler alınamadı; yine de başlatabilirsiniz.'}</div><div class="m">${giris && !state.cerezAc ? '<button class="sbtn blue" id="oturumAc" type="button">Tarayıcı oturumumu kullan</button>' : (giris ? 'Oturum açıkken de alınamadı; tarayıcıda o siteye giriş yaptığınızdan emin olun.' : '&nbsp;')}</div></div>`;
+      pv.innerHTML = `<div class="ph still"></div><div style="min-width:0"><div class="t" style="color:var(--muted);font-weight:500">${giris ? 'Bu site giriş istiyor.' : esc(d.mesaj || 'Bilgiler alınamadı; yine de başlatabilirsiniz.')}</div><div class="m">${giris && !state.cerezAc ? '<button class="sbtn blue" id="oturumAc" type="button">Tarayıcı oturumumu kullan</button>' : (giris ? 'Oturum açıkken de alınamadı; tarayıcıda o siteye giriş yaptığınızdan emin olun.' : '&nbsp;')}</div></div>`;
       const b = $('#oturumAc'); if (b) b.onclick = () => { openAdv(); $('#cerezAc').click(); };
       return;
     }
@@ -3202,7 +3193,7 @@ async function indirilendenBaslat(x){
 /* ürünler: aynı motor ve ortak hafıza, ayrı adresler (2026-10-20) */
 const URUNLER = {transcript:{ad:'Studio', port:8765, yuz:['video','kitaplik'], acik:'video'}, note:{ad:'Meet', port:8766, yuz:['toplanti'], acik:'toplanti'},
   ghost:{ad:'Ghost', port:8767, yuz:['paylasim'], acik:'paylasim'}, atolye:{ad:'Couple', port:8768, yuz:['atolye'], acik:'atolye', menude:false},   /* 25 Ekim: Couple kapandı (teslim kontrolü Studio'da, müşteri takibi Meet'te) */
-  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}, ledger:{ad:'Ledger', port:8773, yuz:[], acik:''}};   // Ledger 31 Ekim: 8772 Office'in   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
+  content:{ad:'Content', port:8769, yuz:[], acik:''}, pt:{ad:'Health', port:8771, yuz:[], acik:''}, ledger:{ad:'Money', port:8773, yuz:[], acik:''}, office:{ad:'Legal', port:8772, yuz:[], acik:''}, capital:{ad:'Money', port:8774, yuz:[], acik:'', ayri:true, menude:false}};   /* 1 Kasım: Ledger + Capital = Money (Hesaplar 8773, Yatırım 8774), Office = Legal */   /* Capital kendi sunucusunda (8774) */   // Ledger 31 Ekim: 8772 Office'in   // 24 Ekim: Atölye → Couple (8768, kendi sayfası static/couple.html); Content 8769
 const URUN = document.documentElement.dataset.urun || 'transcript', URUN_AD = URUNLER[URUN].ad;
 /* Şirket renkleri (24 Ekim): kırık beyaz #F4F2EE, mor #9A1FF4 gibi açık renkler. Açık renk zeminde yazı koyu; açık temada açık renk çizgi kaybolmasın diye bir ton koyusu */
 function srAcik(h){ const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return false; const v = parseInt(m[1], 16), r = (v >> 16 & 255) / 255, g = (v >> 8 & 255) / 255, b = (v & 255) / 255; return .2126 * r + .7152 * g + .0722 * b > .7; }
@@ -5718,6 +5709,7 @@ async function ghYaz(){ const g = $('#ghGirdi').value.trim(), b = $('#ghYaz'); i
   const r = await ghPost('/api/ghost/yaz', {girdi: g}); b.textContent = 'Yaz';
   if (!r._ok){ toast(r.hata || 'Olmadı', null, null, 7000); ghIpucu(); return; }
   $('#ghGirdi').value = ''; $('#ghGirdi').style.height = ''; ghIpucu();
+  if (r.tur === 'dis_oneri'){ toast('Bu metin gelen önerilerde kayıtlı; sizin fikriniz sayılmadı. Fikirler → Gelen öneriler', null, null, 7000); return; }
   if (r.tur === 'x' || r.tur === 'yazi_link' || r.tur === 'taslak'){ GH.sonuc = {temel: r.temel, p: null, tur: r.tur}; ghSonucCek(); ghSekme('bugun'); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   toast(r.tur === 'video' ? 'Video yazıya dökülüyor; taslak hazır olunca Bugün’de görünür' : 'Taslak yazılıyor; bir iki dakika sürer', null, null, 6000); setTimeout(paylasimlarCiz, 800); }
 // 23 Ekim: bağlantı verilince Ghost karar verir (alıntıla / fikri kendi gönderine çevir / geç); sonuç Bugün'ün en üstünde "Bağlantınız için"
@@ -5853,7 +5845,7 @@ function duzenSatirlari(){
     satir('duzMuzik', 'Müzik altlığı<span class="ack2">Konuşma başlayınca kendiliğinden kısılır, aralarda yükselir</span>', '<button class="sbtn" type="button" id="muzikBtn">Kapalı ▾</button><input type="file" id="muzikDosya" accept="audio/*" hidden>'));
   $('#muzikBtn').onclick = async e => { const b = e.currentTarget; let L = []; try{ L = await (await fetch('/api/muzik')).json(); }catch(_){}
     const sec = store.get('duzen', {}).muzik || '';
-    popover(b, [['Kapalı' + (!sec ? '  ✓' : ''), () => K('muzik', '')], ...L.map(m => ['🎵 ' + m.baslik + (m.ad === sec ? '  ✓' : ''), () => K('muzik', m.ad)]), ['Bilgisayardan müzik ekle…', () => $('#muzikDosya').click()]]); };
+    popover(b, [['Kapalı' + (!sec ? '  ✓' : ''), () => K('muzik', '')], ...L.map(m => [m.baslik + (m.ad === sec ? '  ✓' : ''), () => K('muzik', m.ad)]), ['Bilgisayardan müzik ekle…', () => $('#muzikDosya').click()]]); };
   $('#muzikDosya').onchange = async () => { const f = $('#muzikDosya').files[0]; if (!f) return; const fd = new FormData(); fd.append('dosya', f); toast('Müzik ekleniyor');
     const r = await fetch('/api/muzik', {method: 'POST', body: fd}); const j = await r.json(); if (!r.ok){ toast(j.hata || 'Eklenemedi'); return; } K('muzik', j.ad); toast('Müzik eklendi: ' + j.ad); $('#muzikDosya').value = ''; };
   $$('#duzArkaSeg button').forEach(b => b.onclick = () => K('arka', b.dataset.v)); arkaOnizlemeKur();
@@ -5894,7 +5886,7 @@ function duzEsitle(){
   $$('#duzArkaSeg button').forEach(b => b.setAttribute('aria-pressed', (d.arka || '') === b.dataset.v));
   $$('#sonuc .row .tog[data-k]').forEach(b => b.setAttribute('aria-checked', b.dataset.k === 'altyazi' ? d.altyazi !== false : !!d[b.dataset.k]));
   document.body.classList.toggle('altsiz', d.altyazi === false); document.body.classList.toggle('yatayDegil', !!d.format);
-  if ($('#muzikBtn')) $('#muzikBtn').textContent = (d.muzik ? '🎵 ' + d.muzik.replace(/\.[^.]+$/, '').slice(0, 28) : 'Kapalı') + ' ▾';
+  if ($('#muzikBtn')) $('#muzikBtn').textContent = (d.muzik ? d.muzik.replace(/\.[^.]+$/, '').slice(0, 28) : 'Kapalı') + ' ▾';
 }
 function altSecimKur(row){
   const fr = document.createElement('div'); fr.className = 'row alts alt-only altsec'; fr.innerHTML = `<div class="l">Yazı tipi</div><div class="fsec">${ALT_FONT.map(([k, ad, aile, ag]) => `<button type="button" data-v="${k}" style="font-family:${aile};font-weight:${ag}">${ad}</button>`).join('')}</div>`;
@@ -6283,7 +6275,7 @@ function sohbetCiz(){
   $('#sbBaslik').textContent = toplanti ? 'Bu toplantıyla sohbet' : 'Bu videoyla sohbet';
   $('#sbAlt').textContent = (toplanti ? 'Claude toplantının' : 'Claude videonun') + ' tamamını okudu; ne sorarsanız dakikasıyla yanıtlar.';
   $('#sbMesajlar').innerHTML = SB.gecmis.map(m => m.rol === 'ben' ? `<div class="sbb ben">${esc(m.metin)}</div>` : `<div class="sbb cl ${m.hata ? 'hata' : ''}">${m.hata ? esc(m.metin) : sbZaman(mdHtml(m.metin))}${m.hata ? '' : '<button class="sbk" type="button" title="Kopyala">Kopyala</button>'}</div>`).join('')
-    + (SB.bekliyor ? '<div class="sbb cl yaz"><i></i><i></i><i></i></div>' : '');
+    + (SB.bekliyor ? `<div class="sbb cl">${Bekleme.html('belge', ['Metne bakıyorum', 'İlgili yerleri okuyorum', 'Yanıtı yazıyorum'])}</div>` : '');
   const oneri = toplanti ? ['Kim neyi üstlendi?', 'Benden ne istendi?', 'Karara bağlanmayan ne kaldı?', 'Karşı taraf en çok neye takıldı?'] : ['Ana fikir ne?', 'En çarpıcı üç an?', 'Konuşmacı neyi savunuyor?'];
   $('#sbOneri').innerHTML = SB.gecmis.length || SB.bekliyor ? '' : oneri.map(o => `<button type="button">${esc(o)}</button>`).join('');
   $$('#sbOneri button').forEach(b => b.onclick = () => sohbetSor(b.textContent));
@@ -6299,7 +6291,7 @@ async function sohbetAc(){
 function sohbetKapat(){ document.body.classList.remove('sohbetAcik'); $('#sohbet').setAttribute('aria-hidden', 'true'); }
 async function sohbetSor(soru){
   soru = (soru || '').trim(); if (!soru || SB.bekliyor || !SB.temel) return; const temel = SB.temel;
-  SB.gecmis.push({rol: 'ben', metin: soru}); SB.bekliyor = true; $('#sbGir').value = ''; sbBoy(); sohbetCiz();
+  SB.gecmis.push({rol: 'ben', metin: soru}); SB.bekliyor = true; Bekleme.basla('belge', $('#sbForm')); $('#sbGir').value = ''; sbBoy(); sohbetCiz();
   // yanıt yazıldıkça akar (Claude ekranı gibi); son parça "\x00HATA:" ile başlarsa hata
   const m = {rol: 'claude', metin: ''}; let ciz = 0;
   try{ const r = await fetch('/api/sohbet/' + encodeURIComponent(temel), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({soru})});
@@ -6312,6 +6304,7 @@ async function sohbetSor(soru){
     const h = m.metin.indexOf('\x00HATA:'); if (h >= 0){ m.metin = m.metin.slice(h + 7) || 'Yanıt alınamadı.'; m.hata = true; }
     if (!SB.gecmis.includes(m)) SB.gecmis.push(m.metin ? m : {rol: 'claude', metin: 'Yanıt alınamadı.', hata: true}); }
   catch(e){ if (SB.temel !== temel) return; if (SB.gecmis.includes(m)) { m.hata = true; m.metin = e.message; } else SB.gecmis.push({rol: 'claude', metin: e.message || 'Siteye ulaşılamadı.', hata: true}); }
+  finally{ Bekleme.bitir('belge'); }
   SB.bekliyor = false; sohbetCiz();
 }
 function sbBoy(){ const g = $('#sbGir'); g.style.height = 'auto'; g.style.height = Math.min(160, g.scrollHeight) + 'px'; }
@@ -6346,10 +6339,12 @@ function kisacaHtml(v){
   // 2026-10-23 (ChatGPT brifi): konuşulan, önerilen, kararlaştırılan ve üstlenilen ayrı; her iş ve karar birebir alıntı + zaman kodu; sorumlu ya da tarih söylenmediyse "belirtilmedi"
   const tg = toplantiZamani({baslik: v.baslik, olusturma: v.olusturma}), ben = (window.BEN_AD || '').split(' ')[0].toLocaleLowerCase('tr');
   const zt = sn => sn != null ? `<button type="button" class="zt" data-sn="${sn}">${zamanK(sn)}</button>` : '';
+  // 2026-10-31 (is_kanit.py): Asana/Gmail'de bulunan teslim kanıtı; işareti kaldırırsanız bir daha kendiliğinden kapanmaz
+  const tes = x => x.bitti && x.teslim ? `<small class="ktes">${x.teslim.oto ? 'Kendiliğinden kapandı · ' : ''}${x.teslim.link ? `<a href="${esc(x.teslim.link)}" target="_blank" rel="noopener">${esc(x.teslim.kanit)}</a>` : esc(x.teslim.kanit)}${x.teslim.tarih ? ' · ' + esc(x.teslim.tarih) : ''}</small>` : '';
   const kanit = x => x.alinti ? `<q class="kanit${x.alinti_dogru === false ? ' supheli' : ''}" title="${x.alinti_dogru === false ? 'Bu alıntı transkriptte birebir bulunamadı; kayda bakın' : 'Söylendiği an'}">${esc(x.alinti)}</q>` : '';
   // Çok müşterili toplantı (2026-10-28, kisaca.musteri_ata): her maddede müşteri etiketi, üstte müşteriye göre süzme
   const mk = (k.musteriler || []).length >= 2, mc = x => mk && x.musteri ? `<span class="kmus">${esc(x.musteri)}</span>` : '', dm = x => mk ? ` data-m="${esc(x.musteri || '')}"` : '';
-  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"${dm(x)}><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${mc(x)}${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih yok</em>' : '')}${zt(x.sn)}${kanit(x)}</li>`;
+  const is = (x, ki, ii) => `<li class="${x.bitti ? 'bitti' : ''}"${dm(x)}><label><input type="checkbox" data-k="${ki}" data-i="${ii}" ${x.bitti ? 'checked' : ''}><span>${esc(x.is)}</span></label>${mc(x)}${x.ne_zaman ? `<em title="${esc(x.ne_zaman)}">${esc(gorece(x.ne_zaman, tg))}</em>` : (k.surum >= 2 ? '<em class="yok">tarih yok</em>' : '')}${zt(x.sn)}${kanit(x)}${tes(x)}</li>`;
   const bas = ad => ad.split(/\s+/).filter(Boolean).slice(0, 2).map(ilkHarf).join('');
   const benim = p => ben && p.ad.toLocaleLowerCase('tr').split(/\s+/)[0] === ben;
   const kisiHtml = (p, ki) => { const kalan = p.isler.filter(x => !x.bitti).length;
@@ -6582,6 +6577,34 @@ let asanaOnbellek = null;
 async function asanaDurum(yenile){ if (asanaOnbellek && !yenile) return asanaOnbellek; try{ asanaOnbellek = await (await fetch('/api/asana')).json(); }catch(e){ asanaOnbellek = {bagli:false}; } return asanaOnbellek; }
 
 /* ayarlar */
+/* Yazım tarzı ve örnek gönderiler (2 Kasım; canlı kabul testi: yalnız kutudan çıkınca kaydediyordu, görünür tetik yoktu, yenilemede metin kayboluyordu):
+   yazdıkça taslak tarayıcıda durur, kısa aradan sonra, Kaydet'te, kutudan çıkınca, panel kapanırken ve sayfa giderken kaydedilir; durum satırı neyin olduğunu söyler.
+   Başka yerde değişmişse metin ezilmez, kutuda kalır, seçim kişide. */
+const PY = {px: {}, kayitli: {}, sayac: {}, yol: Promise.resolve(), hazir: false, bagli: false};
+const PY_ALAN = {ayPyTarz: ['tarz', 'eski_tarz'], ayPyOrnek: ['ornekler', 'eski_ornekler']};
+const pyMetin = (px, id) => id === 'ayPyTarz' ? (px.tarz || '') : (px.ornekler || []).join('\n---\n');
+const pyTaslakOku = id => { try{ return JSON.parse(localStorage.getItem('pyTaslak_' + id) || 'null'); }catch(e){ return null; } };
+const pyTaslakYaz = (id, m) => { try{ if (m == null) localStorage.removeItem('pyTaslak_' + id); else localStorage.setItem('pyTaslak_' + id, JSON.stringify({m, eski: PY.kayitli[id]})); }catch(e){} };
+function pyDurum(id, metin, renk, eylemler){ const e = $('#' + id + 'Durum'); if (!e) return; e.textContent = metin; e.style.color = renk || 'var(--muted)';
+  (eylemler || []).forEach(([ad, fn]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'textbtn'; b.style.marginLeft = '6px'; b.textContent = ad; b.onclick = fn; e.append(b); }); }
+function pyGovde(id, m, zorla){ const [alan, eski] = PY_ALAN[id], g = {[alan]: m}; if (!zorla) g[eski] = id === 'ayPyTarz' ? PY.px.tarz : (PY.px.ornekler || []); return JSON.stringify(g); }
+function pyYaz(id, zorla){ clearTimeout(PY.sayac[id]); const el = $('#' + id); if (!el || !PY.hazir) return PY.yol;
+  PY.yol = PY.yol.then(async () => { const m = el.value; if (m === PY.kayitli[id] && !zorla) return;
+    pyDurum(id, 'Kaydediliyor…'); let r = null, j = {};
+    try{ r = await fetch('/api/x-profil', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: pyGovde(id, m, zorla)}); j = await r.json().catch(() => ({})); }catch(e){}
+    if (r && r.status === 409) return pyDurum(id, 'Bu metin başka yerde değişmiş. Sizin metniniz kutuda duruyor.', 'var(--red,#ff453a)', [['Üzerine yaz', () => pyYaz(id, true)], ['Kayıtlı metni getir', async () => { const px = await (await fetch('/api/x-profil')).json(); PY.px = px; PY.kayitli[id] = el.value = pyMetin(px, id); pyTaslakYaz(id, null); pyDurum(id, 'Kayıtlı metin getirildi.'); }]]);
+    if (!r || !r.ok) return pyDurum(id, 'Kaydedilemedi; metniniz kutuda duruyor.', 'var(--red,#ff453a)', [['Yeniden dene', () => pyYaz(id, true)]]);
+    PY.px = j; const son = pyMetin(j, id); if (el.value === m && son !== m.trim()) el.value = son;
+    PY.kayitli[id] = el.value === m ? m : son; if (el.value === m || el.value === son) { PY.kayitli[id] = el.value; pyTaslakYaz(id, null); pyDurum(id, 'Kaydedildi · ' + new Date().toLocaleTimeString((window.DIL || {}).locale || 'tr-TR', {hour: '2-digit', minute: '2-digit'})); } else pyDurum(id, 'Kaydedilmedi'); });
+  return PY.yol; }
+function pyKur(px){ PY.px = px; PY.hazir = true;
+  for (const id of Object.keys(PY_ALAN)) { const el = $('#' + id), son = pyMetin(px, id), t = pyTaslakOku(id); el.value = son; PY.kayitli[id] = son; pyDurum(id, '');
+    if (t && t.m === son) pyTaslakYaz(id, null);
+    else if (t) { el.value = t.m; if (t.eski === son) { pyYaz(id); } else pyDurum(id, 'Kaydedilmemiş metniniz geri getirildi; kayıtlı metin de değişmiş.', 'var(--red,#ff453a)', [['Üzerine yaz', () => pyYaz(id, true)], ['Kayıtlı metni getir', () => { el.value = son; pyTaslakYaz(id, null); pyDurum(id, ''); }]]); }
+    el.oninput = () => { pyTaslakYaz(id, el.value); pyDurum(id, 'Kaydedilmedi'); clearTimeout(PY.sayac[id]); PY.sayac[id] = setTimeout(() => pyYaz(id), 1500); };
+    el.onchange = () => pyYaz(id); $('#' + id + 'Kaydet').onclick = () => pyYaz(id); }
+  if (!PY.bagli) { PY.bagli = true; $('#ayarlar').addEventListener('close', () => Object.keys(PY_ALAN).forEach(id => pyYaz(id)));
+    addEventListener('pagehide', () => { for (const id of Object.keys(PY_ALAN)) { const el = $('#' + id); if (PY.hazir && el && el.value !== PY.kayitli[id]) try{ fetch('/api/x-profil', {method: 'POST', keepalive: true, headers: {'Content-Type': 'application/json'}, body: pyGovde(id, el.value)}); }catch(e){} } }); } }
 async function ayarlarAc(){
   let a; try{ a = await (await fetch('/api/ayarlar')).json(); }catch(e){ toast('Siteye ulaşılamadı'); return; }
   const dlg = $('#ayarlar');
@@ -6633,10 +6656,9 @@ async function ayarlarAc(){
     await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({danisman: v})}); toast(v ? 'Her toplantıdan sonra danışman notu hazırlanacak' : 'Danışman notu kapandı'); };
   $('#ayClaudeTop').onclick = async () => { const v = $('#ayClaudeTop').getAttribute('aria-checked') !== 'true'; $('#ayClaudeTop').setAttribute('aria-checked', v); a.claude_toplanti = v;
     await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({claude_toplanti: v})}); toast(v ? 'Toplantılarda Claude açık' : 'Toplantılar yalnızca bu bilgisayarda işlenecek'); };
-  try{ const px = await (await fetch('/api/x-profil')).json(); $('#ayPyTarz').value = px.tarz || ''; $('#ayPyOrnek').value = (px.ornekler || []).join('\n---\n'); $('#ayPyOto').setAttribute('aria-checked', px.takip_otomatik !== false); $('#ayPyHer').setAttribute('aria-checked', px.her_video !== false);
+  try{ PY.hazir = false; await PY.yol; const pxr = await fetch('/api/x-profil'); if (!pxr.ok) throw new Error('profil okunamadı'); const px = await pxr.json(); pyKur(px); $('#ayPyOto').setAttribute('aria-checked', px.takip_otomatik !== false); $('#ayPyHer').setAttribute('aria-checked', px.her_video !== false);
     $('#ayPyHer').onclick = () => { const v = $('#ayPyHer').getAttribute('aria-checked') !== 'true'; $('#ayPyHer').setAttribute('aria-checked', v); pyKaydet({her_video: v}); };
-    const pyKaydet = async (b) => { await fetch('/api/x-profil', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(b)}); toast('Kaydedildi'); };
-    $('#ayPyTarz').onchange = () => pyKaydet({tarz: $('#ayPyTarz').value}); $('#ayPyOrnek').onchange = () => pyKaydet({ornekler: $('#ayPyOrnek').value});
+    const pyKaydet = async (b) => { const r = await fetch('/api/x-profil', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(b)}); toast(r.ok ? 'Kaydedildi' : 'Kaydedilemedi'); };
     $('#ayPyOto').onclick = () => { const v = $('#ayPyOto').getAttribute('aria-checked') !== 'true'; $('#ayPyOto').setAttribute('aria-checked', v); pyKaydet({takip_otomatik: v}); }; }catch(e){}
   $('#ayEpostalar').value = (a.benim_epostalar || []).join(', '); $('#ayEpostalar').onchange = async () => { await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({benim_epostalar: $('#ayEpostalar').value.split(',').map(x => x.trim()).filter(Boolean)})}); toast('Kaydedildi'); };
   $('#ayNotlar').setAttribute('aria-checked', a.notlar_gonder !== false); $('#ayNotlar').onclick = async () => { const v = $('#ayNotlar').getAttribute('aria-checked') !== 'true'; $('#ayNotlar').setAttribute('aria-checked', v); await fetch('/api/ayarlar', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({notlar_gonder: v})}); toast(v ? 'Notlar e-postayla gelecek' : 'E-posta kapalı'); };
@@ -6657,14 +6679,23 @@ $('#ayarBtn').onclick = ayarlarAc;
 
 let claudeBekle = null;
 async function claudeKullanimCiz(){
+  // 2026-10-31: Claude dengeleyicisi (claude_butce.py). Aboneliğin gerçek doluluğu (5 saat / hafta), ürün ürün pay, dengeleyicinin yaptıkları.
   const satir = $('#ayClaudeKullanim'); if (!satir) return;
-  let d; try{ d = await (await fetch('/api/claude/kullanim?gun=7')).json(); }catch(e){ return; }
-  const t = d.toplam || {}, bin = n => n >= 1000 ? (n / 1000).toLocaleString(((window.DIL || {}).locale || 'tr-TR'), {maximumFractionDigits: 0}) + ' bin' : String(n);
-  satir.classList.toggle('hidden', !t.istek && !d.sinir);
-  const isler = Object.entries(d.isler || {}).sort((a, b) => (b[1].istek || 0) - (a[1].istek || 0));   // sunucu sözlüğü abece sırasıyla geliyor
-  $('#ayClaudeKullanimNot').innerHTML = (d.sinir ? `<span style="color:var(--orange)">Abonelik kullanım sınırına ulaşıldı; ${new Date(d.sinir.bitis * 1000).toLocaleTimeString(((window.DIL || {}).locale || 'tr-TR'), {hour:'2-digit', minute:'2-digit'})} sonrasına kadar bilgisayardaki model kullanılıyor.</span><br>` : '')
-    + `Son 7 günde ${t.istek || 0} istek · bugün ${t.bugun || 0}` + (isler.length ? ` · en çok: ${esc(isler.slice(0, 3).map(([k, v]) => `${k} (${v.istek})`).join(', '))}` : '')
-    + (isler.length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${isler.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.istek} istek</td><td>${bin(v.giris + v.cikis)} birim</td></tr>`).join('')}</table></details>` : '');
+  let d; try{ d = await (await fetch('/api/claude/butce?gun=7&tazele=1')).json(); }catch(e){ return; }
+  const sv = d.seviye || {}, loc = ((window.DIL || {}).locale || 'tr-TR');
+  satir.classList.toggle('hidden', !(d.urunler || []).length && !sv.olcum);
+  const renk = {bol:'var(--green)', normal:'var(--green)', dikkat:'var(--orange)', kritik:'var(--orange)', sinir:'var(--red)'}[sv.seviye] || 'var(--muted)';
+  const saat = t => t ? new Date(t * 1000).toLocaleString(loc, {weekday:'short', hour:'2-digit', minute:'2-digit'}) : '';
+  const cubuk = (ad, v, isaret, alt) => `<div style="margin:6px 0 2px;font-size:12px">${ad} <b>%${Math.round((v || 0) * 100)}</b>${alt ? ` · <span style="color:var(--muted)">${alt}</span>` : ''}</div>
+    <div style="position:relative;height:6px;border-radius:3px;background:var(--line,rgba(127,127,127,.2))"><div style="height:6px;border-radius:3px;width:${Math.min(100, Math.round((v || 0) * 100))}%;background:${renk};transition:width .6s"></div>${isaret != null ? `<div title="Haftanın bu noktasında beklenen" style="position:absolute;top:-3px;left:${Math.min(100, Math.round(isaret * 100))}%;width:2px;height:12px;background:var(--fg,#888);opacity:.55"></div>` : ''}</div>`;
+  const ol = d.dengeleyici || {}, urun = (d.urunler || []).filter(u => u.pay >= 1);
+  $('#ayClaudeKullanimNot').innerHTML =
+    `<span class="chip" style="color:${renk};border-color:${renk}">${esc(d.seviye_ad || '')}</span> ${esc(sv.neden || '')}`
+    + (sv.olcum ? cubuk('5 saatlik pencere', sv.p5, null, sv.r5 ? `${saat(sv.r5)} yenilenir` : '') + cubuk('Bu hafta', sv.p7, sv.beklenen, sv.r7 ? `${saat(sv.r7)} yenilenir` : '') : '')
+    + ((d.oneriler || []).length ? `<ul style="margin:8px 0 0;padding-left:18px">${d.oneriler.map(o => `<li>${esc(o)}</li>`).join('')}</ul>` : '')
+    + (urun.length ? `<div style="margin-top:8px;font-size:12px">Son 7 günde kullanım: ${urun.slice(0, 6).map(u => `${esc(u.ad)} %${Math.round(u.pay)}`).join(' · ')}</div>` : '')
+    + ((ol.bekletildi || ol.hafif_model || ol.atlandi) ? `<div style="font-size:12px;color:var(--muted)">Dengeleyici bu hafta: ${ol.bekletildi || 0} iş bekletti, ${ol.hafif_model || 0} işi hafif modele geçirdi, ${ol.atlandi || 0} işi atladı.</div>` : '')
+    + ((d.isler || []).length ? `<details style="margin-top:6px"><summary>İş iş göster</summary><table class="kultab">${d.isler.map(x => `<tr><td>${esc(x.ad)}</td><td>${esc(x.urun)}</td><td>%${x.pay}</td><td>${x.istek} istek</td></tr>`).join('')}</table></details>` : '');
 }
 function claudeCiz(a){
   const act = $('#ayClaudeAct'), not = $('#ayClaudeNot'), d = a.claude_durum || {};
@@ -6966,7 +6997,7 @@ function stCizgi(){
       m.before($('#modehint')); stHaritaKur(m); }
     if (URUN === 'atolye'){ const h2 = $('#atolyeSec .sh h2'); if (h2) h2.textContent = URUNLER.atolye.ad; }
     $$('#yuz button').forEach(b => b.hidden = !URUNLER[URUN].yuz.includes(b.dataset.v)); document.body.classList.add('urun-' + URUN);
-    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN)).map(([k, u]) => `<a href="${k === URUN ? location.origin + '/' : ((location.protocol === 'https:' && /\.ts\.net$/.test(location.hostname) ? 'http:' : location.protocol) + '//' + location.hostname + ':' + u.port + '/')}" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
+    const g = document.createElement('div'); g.className = 'urunler'; const KURULU = (document.documentElement.dataset.urunler || '').split(',').filter(Boolean); g.innerHTML = Object.entries(URUNLER).filter(([k, u]) => (u.menude !== false || k === URUN) && (!KURULU.length || KURULU.includes(k) || k === URUN || u.ayri)).map(([k, u]) => `<a href="${k === URUN ? location.origin + '/' : ((location.protocol === 'https:' && /\.ts\.net$/.test(location.hostname) ? 'http:' : location.protocol) + '//' + location.hostname + ':' + u.port + '/')}" class="${k === URUN ? 'on' : ''}"><img src="/static/logo/${k}.svg" alt="">${u.ad}</a>`).join('');
     const ub = document.createElement('button'); ub.type = 'button'; ub.className = 'urunbtn'; ub.setAttribute('aria-label', 'Diğer ürünler'); ub.title = 'Diğer ürünler';
     ub.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>'; const mg = document.createElement('span'); mg.className = 'markaGrup'; $('.brand').before(mg); mg.append($('.brand'), ub, g);
     ub.onclick = e => { e.stopPropagation(); g.classList.toggle('acik'); }; document.addEventListener('click', e => { if (!e.target.closest('.urunbtn,.urunler')) g.classList.remove('acik'); });
@@ -6980,11 +7011,14 @@ function stCizgi(){
     if (Object.keys(state.jobs).length && !state.timer){ state.timer = setInterval(pollJobs, 1500); pollJobs(); } }catch(e){}
 })();
 </script>
-<script src="/static/studio_ek.js?v=40"></script>
+<script src="/static/studio_ek.js?v=59"></script>
 <script src="/static/meet_ek.js?v=26"></script>
-<script src="/static/meet_asistan.js?v=3"></script>
+<script src="/static/meet_asistan.js?v=13"></script>
 <script src="/static/teslim_ek.js?v=2"></script>
 <script src="/static/takip_ek.js?v=2"></script>
-<script src="/static/ghost_ek.js?v=5"></script>
+<script src="/static/ghost_ek.js?v=9"></script>
+<script src="/static/ghost_oneri.js?v=7"></script>
+<script src="/static/ghost_arsiv.js?v=1"></script>
+<script src="/static/zil.js?v=2"></script>
 </body>
 </html>

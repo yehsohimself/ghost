@@ -14,7 +14,7 @@ import urllib.error
 import urllib.request
 
 SITE = "http://127.0.0.1:8765"
-KAPILAR = range(8765, 8774)   # 2026-10-31: 8772 Office, 8773 Ledger
+KAPILAR = [*range(8765, 8772), 8773]   # sitenin açtığı kapılar; 8772 tek başına çalışan Office sunucusunun, site onu açmaz (2026-10-31)
 
 
 def yabanci_kapilar():

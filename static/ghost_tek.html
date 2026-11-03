@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<script src="/static/tema.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,6 +15,7 @@
 <style>
   :root{--zemin:#08080a;--yuzey:#111114;--cizgi:rgba(255,255,255,.11);--yazi:#f4f4f6;--gri:#8e8e96;--pembe:#ff3d9a;--yesil:#30d158;--turuncu:#ffb340;
         --mono:'Geist Mono',ui-monospace,monospace}
+  :root[data-theme="light"]{--zemin:#f7f7f5;--yuzey:#fff;--cizgi:rgba(0,0,0,.09);--yazi:#1c1c1e;--gri:#6e6e73}
   @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--zemin:#f7f7f5;--yuzey:#fff;--cizgi:rgba(0,0,0,.09);--yazi:#1c1c1e;--gri:#6e6e73}}
   *{box-sizing:border-box;margin:0}
   body{background:var(--zemin);color:var(--yazi);font:16px/1.45 Geist,-apple-system,system-ui,sans-serif;min-height:100vh;
@@ -21,7 +23,7 @@
   .ust{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
   .ust b{font-size:22px;letter-spacing:-.02em}
   .etk{font:600 11px/1 var(--mono);color:var(--gri);letter-spacing:.06em}
-  .kart{background:var(--yuzey);border:1px solid var(--cizgi);border-radius:18px;padding:16px;box-shadow:0 0 0 1px rgba(255,61,154,.06),0 18px 50px -30px rgba(255,61,154,.5)}
+  .kart{background:var(--yuzey);border:1px solid var(--cizgi);border-radius:18px;padding:16px;box-shadow:0 0 0 1px rgba(255,61,154,.06)}
   .bag{font-size:13px;color:var(--gri);margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
   .bag b{color:var(--yazi);font-weight:600}
   textarea{width:100%;background:none;border:0;color:inherit;font:inherit;font-size:18px;line-height:1.45;resize:none;outline:none;min-height:120px}

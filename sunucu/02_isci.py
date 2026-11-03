@@ -110,13 +110,14 @@ def _isci():
                         _yuklemeyi_sakla(is_)
                     except Exception:  # noqa: BLE001
                         pass
-                _bildir("Transkript hazır", is_.get("baslik") or is_["link"])
+                _bu = "atolye" if "/.atolye/" in str(is_.get("link")) else "note" if is_.get("toplanti") else "ghost" if is_.get("ghost") else "transcript"
+                _bildir("Transkript hazır", is_.get("baslik") or is_["link"], url=_urun_adresi(_bu, is_.get("temel") or ""), urun=_bu)
                 _zincir(is_)
             else:
                 is_["durum"] = "hata"
                 is_["hata"] = ("İş yarıda kesildi; program beklenmedik biçimde kapandı." if p.returncode < 0
                                else _hata_metni("\n".join(is_["log"][-40:])))
-                _bildir("Transkript olmadı", is_["hata"])
+                _bildir("Transkript olmadı", is_["hata"], urun="note" if is_.get("toplanti") else "transcript")
         except Exception as e:  # noqa: BLE001
             is_["durum"] = "hata"
             is_["hata"] = str(e)

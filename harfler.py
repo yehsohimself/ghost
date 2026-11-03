@@ -97,6 +97,6 @@ def ust(s):
 
 
 if __name__ == "__main__":
-    for t in ["Migros", "Netflix", "PepsiCo", "CheckYourSocial", "Ev alamayacaksam neden biriktireyim?", "LinkedIn · bu hafta",
-              "Garanti BBVA", "Instagram'da ilk 11", "Digital strateji", "Inner Circle", "Dijital Terapi", "Social media için dijital kampanya"]:
+    for t in ["Migros", "Netflix", "PepsiCo", "Ev alamayacaksam neden biriktireyim?", "LinkedIn · bu hafta",
+              "Garanti BBVA", "Instagram'da ilk 11", "Digital strateji", "Dijital Terapi", "Social media için dijital kampanya"]:
         print(t, "→", ust(t))

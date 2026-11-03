@@ -8,7 +8,7 @@
    index.html'deki Ghost işlevlerini sarmalar; panel #gh'nin dışında durur (sayfa her yenilendiğinde konuşma kaybolmasın). */
 (() => {
 if (typeof URUN === 'undefined' || URUN !== 'ghost') return;
-const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/ghost_ek.css?v=3'; document.head.appendChild(css);
+const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/static/ghost_ek.css?v=5'; document.head.appendChild(css);
 
 const GS = {acik: false, odak: null, mesajlar: [], kars: null, acilis: null, akiyor: false, yuklendi: false, kaydedilen: {}};
 let AV_N = 0;
@@ -93,7 +93,7 @@ function eylemHtml(m, e, i){
 function mesajHtml(m, sonGhost){
   if (m.rol === 'ben') return `<div class="gs-m ben"><div class="gs-balon">${md(m.metin)}</div><time>${saat(m.zaman)}</time></div>`;
   const E = (m.eylemler || []).map((e, i) => eylemHtml(m, e, i)).join('');
-  return `<div class="gs-m ghost${m.hata ? ' hata' : ''}" data-id="${m.id || ''}">${AV(m.akiyor ? 'konusuyor' : '')}<div class="gs-ic"><div class="gs-metin">${m.akiyor && !m.metin ? '<span class="gs-dusun"><i></i><i></i><i></i></span>' : md(m.metin)}${m.akiyor && m.metin ? '<span class="gs-imlec"></span>' : ''}</div>${E}${m.zaman && !m.akiyor ? `<time>${saat(m.zaman)}</time>` : ''}</div></div>`;
+  return `<div class="gs-m ghost${m.hata ? ' hata' : ''}" data-id="${m.id || ''}">${AV(m.akiyor ? 'konusuyor' : '')}<div class="gs-ic"><div class="gs-metin">${m.akiyor && !m.metin ? Bekleme.html('ghost', ['Planınıza ve taslaklarınıza bakıyorum', 'Düşünüyorum', 'Yazıyorum']) : md(m.metin)}${m.akiyor && m.metin ? '<span class="gs-imlec"></span>' : ''}</div>${E}${m.zaman && !m.akiyor ? `<time>${saat(m.zaman)}</time>` : ''}</div></div>`;
 }
 function ciz(asagi){
   const A = $('#gsAkis'), yakin = A.scrollHeight - A.scrollTop - A.clientHeight < 80;
@@ -105,7 +105,8 @@ function ciz(asagi){
   A.innerHTML = h;
   const son = L[L.length - 1];
   const S = GS.akiyor ? [] : GS.acilis ? (GS.acilis.secenekler || []) : son && son.rol === 'ghost' ? (son.secenekler || []) : [];
-  $('#gsHizli').innerHTML = S.map(s => `<button class="gs-cip" type="button" data-gs="cip">${esc(s)}</button>`).join('');
+  const kart = !GS.akiyor && !GS.acilis && son && son.rol === 'ghost' ? SoruKarti.html('gh' + (son.id || son.zaman), son.sorular, gsGonder) : '';
+  $('#gsHizli').innerHTML = kart || S.map(s => `<button class="gs-cip" type="button" data-gs="cip">${esc(s)}</button>`).join('');
   const o = $('#gsOdak'); o.hidden = !GS.odak;
   if (GS.odak) o.innerHTML = `<span>${esc(odakAd(GS.odak))}</span><button class="gs-ib" type="button" data-gs="odaksil" title="Genel konuşmaya dön" aria-label="Odağı kaldır">${IK.x}</button>`;
   $$('#gsAkis .gs-tk-m').forEach(boy);
@@ -129,7 +130,7 @@ async function gsGonder(metin){
   GS.mesajlar.push({rol: 'ben', metin, zaman: Date.now() / 1000});
   const yer = {rol: 'ghost', metin: '', akiyor: true, zaman: Date.now() / 1000};
   GS.mesajlar.push(yer); GS.akiyor = true; $('#gsGir').value = ''; boy($('#gsGir')); guncelleGonder();
-  durum('Düşünüyor…', 'dusunuyor'); ciz(true);
+  durum('Düşünüyor…', 'dusunuyor'); Bekleme.basla('ghost', $('#gsGir').closest('.gs-gir')); ciz(true);
   let tam = '';
   try{
     const r = await fetch('/api/ghost/sohbet', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mesaj: metin, odak: GS.odak, acilis})});
@@ -150,7 +151,7 @@ async function gsGonder(metin){
   }catch(e){
     Object.assign(yer, {akiyor: false, hata: true, zaman: Date.now() / 1000, metin: (yer.metin ? yer.metin + '\n\n' : '') + 'Şu an cevap veremiyorum: ' + String(e.message || e).slice(0, 160)});
   }
-  GS.akiyor = false; durum('İletişim danışmanınız ve yazı ortağınız'); ciz(true); guncelleGonder();
+  GS.akiyor = false; Bekleme.bitir('ghost'); durum('İletişim danışmanınız ve yazı ortağınız'); ciz(true); guncelleGonder();
 }
 function akisCiz(m){
   const el = $$('#gsAkis .gs-m.ghost').slice(-1)[0]; if (!el) return ciz(true);

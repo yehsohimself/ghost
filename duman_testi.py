@@ -59,7 +59,13 @@ def hizli():
             hatalar.append(f"sızıntı: {b['dosya']}:{b['satir']} {b['tur']}: {b['parca']}")
     except Exception as e:  # noqa: BLE001
         hatalar.append(f"sızıntı denetimi çalışmadı: {e}")
-    for js in [j for j in ("studio_ek.js", "pt-sw.js") if (KLASOR / "static" / j).exists()]:   # ayrı betik dosyaları (sözdizimi hatası bütün ekleri durdurur)
+    try:                                                   # 2026-11-03: görünüm kuralı; siteyi durdurmaz, yalnız uyarır
+        import arayuz_denetim
+        for b in arayuz_denetim.denetle()[:12]:
+            print(f"uyarı, arayüz: {b['dosya']}:{b['satir']} {b['tur']}: {b['parca']}")
+    except ImportError:
+        pass
+    for js in [j for j in ("studio_ek.js", "pt-sw.js", "bekleme.js", "tema.js", "zil.js", "soru_karti.js") if (KLASOR / "static" / j).exists()]:   # ayrı betik dosyaları (sözdizimi hatası bütün ekleri durdurur)
         node = shutil.which("node") or str(Path.home() / ".local" / "bin" / "node")
         r = subprocess.run([node, "--check", str(KLASOR / "static" / js)], capture_output=True, text=True) if Path(node).exists() else None
         if r is not None and r.returncode:

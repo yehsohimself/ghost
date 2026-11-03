@@ -196,11 +196,11 @@ def ghost_girdisi(konu, deneyim="", secki=None):
     if "oneri" in konu:      # Öneri Havuzu satırı
         g = f"FİKİR: {konu['oneri']}\nNE YAPILACAK: {konu.get('ne', '')}\n" + (f"KAYNAK: {konu['kaynak']}\n" if konu.get("kaynak") else "")
     else:
-        g = (f"KONU: {konu['baslik']}\n{konu.get('metin', '')}\n" + (f"NEDEN ÖNEMLİ: {konu['neden']}\n" if konu.get("neden") else "")
+        g = (f"KONU: {konu['baslik']}\n{konu.get('metin', '')}\n" + (f"EDİTÖR NOTU (ChatGPT seçkisinin yorumu; kişinin görüşü değil, ona atfetme): {konu['neden']}\n" if konu.get("neden") else "")
              + (f"KANIT SINIRI (bunun ötesini iddia etme): {konu['kanit_siniri']}\n" if konu.get("kanit_siniri") else "")
              + (f"KAYNAKLAR: {', '.join(konu.get('kaynaklar') or [])}\n" if konu.get("kaynaklar") else ""))
         if secki and (secki.get("hipotez") or {}).get("baslik"):
-            g += f"O GÜNÜN HİPOTEZİ (ChatGPT seçkisi): {secki['hipotez']['baslik']}\n"
+            g += f"O GÜNÜN HİPOTEZİ (ChatGPT seçkisi; kişinin görüşü değil): {secki['hipotez']['baslik']}\n"
     if deneyim.strip():
         g += f"\nKİŞİNİN KENDİ KARŞILIĞI (gönderinin merkezi bu; kendi işinden/gözleminden; olduğu gibi kullan, büyütme):\n{deneyim.strip()}\n"
     return g

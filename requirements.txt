@@ -9,3 +9,6 @@ python-dateutil
 mcp>=2.3
 mlx-embeddings
 pytest
+pdfplumber>=0.11  # Ledger: banka ekstresi PDF satırları (konumlu)
+gallery-dl>=1.32  # Studio: görsel gönderileri (Instagram, Pinterest, Tumblr...)
+trafilatura>=2.3  # Studio: sayfadan yazı

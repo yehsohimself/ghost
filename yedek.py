@@ -63,7 +63,7 @@ def dosyalar():
     L += [k / f for f in ("ayarlar.json", "sesler.json", "takip.json", ".isler.json", "CLAUDE.md", "NOTLAR_OZEL.md", ".sizinti_izin.txt", ".sizinti_ek.txt") if (k / f).exists()]   # çalışma notları git dışı (2026-10-25)
     for kl, desen in (("profil", "*"), ("atolye", "*.json"), ("atolye", "*.jsonl"), ("atolye/bilgi", "*.json"), ("atolye/calismalar", "*.json"),
                       ("markalar", "**/*.json"), ("ozetler", "*.md"), ("kayitlar", "**/*.json"), ("kayitlar", "**/*.jsonl"), ("radar", "*.md"),
-                      ("pt", "**/*.json"), ("ghost", "*.json"), ("reports", "*.md"), ("indirilenler", ".dizin.json"), ("indirilenler/.kapaklar", "*.jpg"),
+                      ("pt", "**/*.json"), ("office", "**/*.json"), ("office", "**/*.jsonl"), ("ghost", "*.json"), ("reports", "*.md"), ("indirilenler", ".dizin.json"), ("indirilenler/Görseller", ".dizin.json"), ("indirilenler/.kapaklar", "*.jpg"),
                       ("misafir", "*.json"), ("content", "**/*.json"), ("couple", "**/*.json"), ("reklam_arsivi", "arsiv.json")):
         L += [p for p in (k / kl).glob(desen) if p.is_file() and p.stat().st_size < EN_BUYUK_MB * 1e6 and ".canli" not in p.parts]
     L += _drive_gitmemis_sesler(k)

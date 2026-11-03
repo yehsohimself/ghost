@@ -137,7 +137,7 @@ def oto_tani(gun=10, esik=0.6, yaz=True):
         p = (d.get("veri") or {}).get("paylasim") or {}
         bas = p.get("ilk_zaman") or p.get("zaman") or js.stat().st_mtime - 86400
         for i, t in enumerate(p.get("taslaklar") or []):
-            if t.get("paylasildi") or t.get("yayin") or (t.get("platform") or "x") != "x":
+            if t.get("paylasildi") or t.get("yayin") or (t.get("platform") or "x") != "x" or t.get("dis_oneri"):   # gelen öneriden çıkan taslak yalnız kişi onaylarsa paylaşıldı sayılır
                 continue
             m = _norm(t.get("metin"))
             if len(m) < 25:

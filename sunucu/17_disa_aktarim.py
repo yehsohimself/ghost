@@ -36,7 +36,7 @@ def _kunye(temel, veri):
                   "ad": veri.get("kanal") or "", "link": link}
     else:
         kaynak = {"tur": "dosya", "ad": Path(link).name if link else "", "link": ""}
-    satir = [{"ad": "Yazıya döküldü", "zaman": veri.get("olusturma"), "deger": veri.get("kaynak") or _model_adi(veri.get("model"))}]
+    satir = [{"ad": "Alındı" if veri.get("yazi") else "Yazıya döküldü", "zaman": veri.get("olusturma"), "deger": veri.get("kaynak") or _model_adi(veri.get("model"))}]
     oz = veri.get("ozet") if isinstance(veri.get("ozet"), dict) else None
     if oz:
         satir.append({"ad": "Özet", "deger": _model_adi(oz.get("model"))})
@@ -125,7 +125,7 @@ def disa_kitaplik(bicim):
 
 @app.get("/indir/<dosya>")
 def indir(dosya):
-    m = re.match(r"^([\w\-]+)\.(txt|docx|srt|senaryo\.docx|senaryo\.txt|notlar\.txt|[a-z]{2,3}\.(?:srt|docx|txt)|[a-z_]{4,30}\.(?:docx|txt))$", dosya)
+    m = re.match(r"^([\w\-]+)\.(txt|md|docx|srt|senaryo\.docx|senaryo\.txt|notlar\.txt|[a-z]{2,3}\.(?:srt|docx|txt)|[a-z_]{4,30}\.(?:docx|txt))$", dosya)
     _transkript_modulu.bekleyenleri_yaz(str(KLASOR / m.group(1))) if m else None   # ertelenmiş docx/srt varsa önce yazılır
     if not m or not (KLASOR / dosya).exists():
         abort(404)

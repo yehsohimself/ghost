@@ -399,7 +399,7 @@ def _video_isi_calistir(is_):
     is_["kalite"] = is_["tur"]
     _indirme_bitir(is_)
     is_["durum"] = "bitti"
-    _bildir("Video hazır", is_.get("baslik") or temel)
+    _bildir("Video hazır", is_.get("baslik") or temel, url=_urun_adresi("transcript", temel))
     if is_.get("baslik_ek") == "Shorts 1" and is_.get("kanca_stil") != "sade":   # marka paketi: aynı yüksek çözünürlüklü kaynaktan kapak taslakları
         threading.Thread(target=_kapak_taslak, args=(temel, kaynak), daemon=True).start()
 

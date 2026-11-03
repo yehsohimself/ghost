@@ -88,11 +88,13 @@ def _taslaklar(gun=2):
         if v.get("toplanti") or not p.get("taslaklar") or (p.get("ilk_zaman") or p.get("zaman") or k["mtime"]) < sinir:
             continue
         temel = ("ghost__" + k["temel"]) if Path(k["yol"]).parent.name == "ghost" else k["temel"]
+        z = p.get("ilk_zaman") or p.get("zaman") or 0
+        gun_ = dt.date.fromtimestamp(z).isoformat() if z else ""
         for i, t in enumerate(p["taslaklar"]):
-            if t.get("gizli") or t.get("paylasildi"):
+            if t.get("gizli") or t.get("paylasildi") or t.get("arsiv"):          # arşivdeki (gündemi geçmiş) öneri konuşmaya girmez (1 Kasım)
                 continue
             out.append({"anahtar": f"{temel}#{i}", "metin": str(t.get("metin") or "")[:600], "alan": t.get("alan") or "", "platform": t.get("platform") or "x",
-                        "okur": t.get("okur") or {}, "neden": str(t.get("katki") or t.get("neden") or "")[:200], "zaman": p.get("ilk_zaman") or p.get("zaman") or 0})
+                        "okur": t.get("okur") or {}, "neden": str(t.get("katki") or t.get("neden") or "")[:200], "zaman": z, "gun": gun_})
     return sorted(out, key=lambda x: -x["zaman"])
 
 
@@ -148,21 +150,37 @@ def baglam(odak=None):
     d = ghost_danisman._oku()
     r = d.get("rapor") or {}
     if r.get("not"):
-        b.append("BU HAFTAKİ DANIŞMAN NOTUN: " + str(r["not"])[:600])
+        yas = int((time.time() - (r.get("zaman") or time.time())) // 86400)
+        b.append(f"DANIŞMAN NOTUN ({'bugün' if yas == 0 else f'{yas} gün önce'} yazıldı): " + str(r["not"])[:600])
     try:
         pl = ghost_danisman.plan()
-        if pl["maddeler"]:
-            b.append("BU HAFTANIN PLANI (i numarasıyla; durum kodla izlenir):\n" + "\n".join(
+        gelen = [x for x in pl["maddeler"] if x["tarih"] >= dt.date.today().isoformat()]
+        if gelen:
+            b.append("HAFTANIN PLANINDA BUGÜN VE SONRASI (i numarasıyla; durum kodla izlenir):\n" + "\n".join(
                 f"- i={x['i']} {x['gun']} {x['tarih']}: {x['ne']} [{x['mecra']}] durum: {x['durum']}" + (f", taslak: {x['taslak']}" if x.get("taslak") else "")
-                for x in pl["maddeler"]))
+                for x in gelen))
+        elif pl["maddeler"]:
+            b.append("HAFTANIN PLANI: bu haftanın planı bitti; yenisi pazartesi yazılır.")
         rt = ghost_danisman.ritim()
         b.append(f"RİTİM: bu hafta {rt.get('bu_hafta')} gönderi, haftalık hedef {rt.get('hedef')}, üst üste hedefi tutan hafta {rt.get('seri')}.")
     except Exception:  # noqa: BLE001
         pass
     T = _taslaklar()
-    if T:
-        b.append("BUGÜN VE DÜN ÖNERDİĞİN TASLAKLAR (anahtar ile):\n" + "\n".join(
-            f"- {t['anahtar']} [{t['alan']}, {t['platform']}]: {t['metin'][:260]}" + (f" (okur: {_okur_ozeti(t['okur'])})" if t["okur"] else "") for t in T[:8]))
+    bugun = dt.date.today().isoformat()
+    satir = lambda t: f"- {t['anahtar']} [{t['alan']}, {t['platform']}]: {t['metin'][:260]}" + (f" (okur: {_okur_ozeti(t['okur'])})" if t["okur"] else "")   # noqa: E731
+    TB, TE = [t for t in T if t["gun"] == bugun], [t for t in T if t["gun"] != bugun]
+    b.append("BUGÜN ÖNERDİĞİN TASLAKLAR (anahtar ile):\n" + "\n".join(satir(t) for t in TB[:8]) if TB else
+             "BUGÜN HENÜZ TASLAK YOK (günün önerileri sabah turunda yazılır).")
+    if TE:
+        b.append("DÜN ÖNERDİĞİN, HENÜZ ARŞİVE GİTMEMİŞ TASLAKLAR (bugünkü diye sunma; tarihleriyle):\n"
+                 + "\n".join(f"{satir(t)} [tarih {t['gun']}]" for t in TE[:5]))
+    try:
+        kd = json.loads((KLASOR / "kayitlar" / "kesif" / f"{bugun}.json").read_text(encoding="utf-8"))
+        G = [f"- {o.get('baslik')} ({o.get('kaynak')}, {o.get('alan')})" for o in (kd.get("oneriler") or [])[:8] if o.get("baslik")]
+        if G:
+            b.append("BUGÜNÜN GÜNDEMİ (bu sabah taranan kaynaklardan seçilenler):\n" + "\n".join(G))
+    except (OSError, ValueError):
+        b.append("BUGÜNÜN GÜNDEMİ: bugün henüz kaynak taranmadı.")
     try:
         import ghost_defter
         N = ghost_defter.notlar(6)
@@ -217,6 +235,8 @@ NASIL KONUŞURSUN
 - Gönderi metni yazarsan ONUN sesiyle yaz (örnekler ve ilkeler aşağıda), yorumcu cümlesi ve vecize kapanış yok; olgu uydurma; metni yanıtın içine değil
   eylem olarak 'taslak' kartına koy, yanıtta kısaca ne yaptığını söyle.
 - Siyaset, din, kimlik kavgası, yatırım tavsiyesi önermezsin (kaçındıkları).
+- ZAMAN: verilerdeki tarihlere dikkat et. "Bugün" sorulursa yalnız bugünün taslaklarından, bugünün gündeminden ve bugünkü plan maddesinden konuş; dünkü bir
+  öneriyi bugünkü gibi sunma (anarsan "dünden kalan" de). Bugün henüz taslak ya da gündem yoksa bunu açıkça söyle; eski konuyu gündem diye önerme.
 
 VERİLER
 {baglam}
@@ -229,12 +249,13 @@ KONUŞMA (en eskiden yeniye):
 {ad}: {mesaj}
 
 Önce yanıtını düz metin olarak yaz. Sonra, gerekiyorsa, tek başına bir satırda @@@ yaz ve ardından JSON ver:
-{{"secenekler": ["onun verebileceği 2-4 kısa cevap; içlerinden biri soru olabilir"],
+{{"secenekler": ["onun verebileceği 2-4 kısa cevap; içlerinden biri soru olabilir"], "sorular": [],
   "eylemler": [{{"tur": "taslak|duzenle|yaz|gorus|fikir|ogren|plan", "baslik": "düğmede görünecek 2-5 kelime",
      "metin": "taslak/duzenle: gönderinin tam metni · gorus/fikir: onun sözü (büyütmeden) · ogren: kalıcı yazım tercihi, emir kipi tek cümle",
      "platform": "x|linkedin", "anahtar": "duzenle için taslak anahtarı", "girdi": "yaz için: Ghost'un tam yazım hattına verilecek fikir (onun sözleriyle)",
      "i": "plan için madde numarası", "ne": "plan için yeni madde metni", "neden": "plan için tek cümle"}}]}}
-Eylem yalnız konuşma gerçekten ona varıyorsa (en çok 2). Öneri yoksa @@@ satırını hiç yazma."""
+Eylem yalnız konuşma gerçekten ona varıyorsa (en çok 2). Öneri yoksa @@@ satırını hiç yazma.
+sorular: {soru_karti}"""
 
 
 def _gecmis_metni(ad, n=14):
@@ -245,7 +266,7 @@ def _gecmis_metni(ad, n=14):
 def istem(mesaj, odak=None):
     import ortak
     ad = ortak.kimlik()["ilk_ad"]
-    return ISTEM.format(ad=ad, baglam=baglam(odak), bugun=dt.date.today().strftime("%Y-%m-%d %A"), gecmis=_gecmis_metni(ad), mesaj=str(mesaj)[:4000])
+    return ISTEM.format(ad=ad, soru_karti=ortak.SORU_KARTI_ISTEM, baglam=baglam(odak), bugun=dt.date.today().strftime("%Y-%m-%d %A"), gecmis=_gecmis_metni(ad), mesaj=str(mesaj)[:4000])
 
 
 def ayir(tam):
@@ -275,7 +296,8 @@ def ayir(tam):
             import paylasim
             e["metin"] = paylasim._temiz(str(e["metin"]))
         E.append(e)
-    return metin.strip(), {"secenekler": sec, "eylemler": E[:2]}
+    import ortak
+    return metin.strip(), {"secenekler": sec, "sorular": ortak.soru_karti(ek.get("sorular")), "eylemler": E[:2]}
 
 
 def akis(mesaj, odak=None):

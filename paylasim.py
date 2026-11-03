@@ -9,6 +9,7 @@ uret(json, log) → [{"konu", "metin", "uzunluk": "kisa|uzun", "link_oner": bool
 Elle: python paylasim.py transkript_x.json
 """
 import json
+import os
 import re
 from urllib.parse import urlparse
 import sys
@@ -18,6 +19,7 @@ from pathlib import Path
 KLASOR = Path(__file__).resolve().parent
 sys.path.insert(0, str(KLASOR))
 PROFIL = KLASOR / "profil" / "x.json"
+PROFIL_KAYIT = KLASOR / "profil" / "x_kayit_durumu.json"
 
 VARSAYILAN_TARZ = (
     "Birinci tekil şahıs, sakin ve kendinden emin. Büyük resmi gören, hype'a hemen kapılmayan, bir şeyin başını ve sonunu "
@@ -88,19 +90,58 @@ def _persona_blogu(pr, kisa=False, konu="", is_turu=None, platform="x", rehber=T
     return b
 
 
+def profil_kayit_durumu():
+    """Profil kaydının izi: son başarılı kayıt, son hata, hangi alan ne zaman değişti (değerler tutulmaz). Ghost → Profil'de görünür."""
+    try:
+        return json.loads(PROFIL_KAYIT.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def _profil_kayit_yaz(**ek):
+    try:
+        PROFIL_KAYIT.write_text(json.dumps({**profil_kayit_durumu(), **ek}, ensure_ascii=False, indent=1), encoding="utf-8")
+    except OSError:
+        pass
+
+
 def profil_kaydet(tarz=None, ornekler=None, takip_otomatik=None, her_video=None, **ek):
+    """Kilit altında taze profil + geçici dosya + yerine koyma: yazım yarıda kalırsa dosya olduğu gibi kalır. Dosya okunamıyorsa üzerine YAZILMAZ
+    (eskiden profil() boş dönüyor, ilk kayıt bütün profili siliyordu)."""
+    import kayit_json
     PROFIL.parent.mkdir(parents=True, exist_ok=True)
-    p = profil()
-    if tarz is not None:
-        p["tarz"] = tarz.strip() or VARSAYILAN_TARZ
-    if ornekler is not None:
-        p["ornekler"] = [str(o).strip() for o in ornekler if str(o).strip()][:20]
-    if takip_otomatik is not None:
-        p["takip_otomatik"] = bool(takip_otomatik)
-    if her_video is not None:
-        p["her_video"] = bool(her_video)
-    p.update({k: x for k, x in ek.items() if x is not None})
-    PROFIL.write_text(json.dumps(p, ensure_ascii=False, indent=1), encoding="utf-8")
+    simdi = time.strftime("%Y-%m-%dT%H:%M:%S")
+    try:
+        with kayit_json.kilit(PROFIL):
+            eski = {}
+            if PROFIL.exists():
+                try:
+                    eski = json.loads(PROFIL.read_text(encoding="utf-8"))
+                except ValueError as e:
+                    raise ValueError("Profil dosyası okunamadı; üzerine yazılmadı") from e
+            p = profil()
+            if tarz is not None:
+                p["tarz"] = tarz.strip() or VARSAYILAN_TARZ
+            if ornekler is not None:
+                p["ornekler"] = [str(o).strip() for o in ornekler if str(o).strip()][:20]
+            if takip_otomatik is not None:
+                p["takip_otomatik"] = bool(takip_otomatik)
+            if her_video is not None:
+                p["her_video"] = bool(her_video)
+            p.update({k: x for k, x in ek.items() if x is not None})
+            tmp = PROFIL.with_name(f"{PROFIL.name}.{os.getpid()}.tmp")
+            try:
+                tmp.write_text(json.dumps(p, ensure_ascii=False, indent=1), encoding="utf-8")
+                os.replace(tmp, PROFIL)
+            except OSError:
+                tmp.unlink(missing_ok=True)
+                raise
+    except Exception as e:
+        _profil_kayit_yaz(son_hata=str(e)[:200], hata_zamani=simdi)
+        raise
+    alanlar = sorted(k for k in set(p) | set(eski) if p.get(k) != eski.get(k))
+    gecmis = profil_kayit_durumu().get("gecmis") or []
+    _profil_kayit_yaz(son_basarili=simdi, son_hata=None, hata_zamani=None, gecmis=(gecmis + [{"zaman": simdi, "alanlar": alanlar}])[-40:] if alanlar else gecmis)
     return p
 
 
@@ -130,6 +171,18 @@ def red_geri_al(taslak):
             profil_kaydet(**{an: L})
 
 
+def _dis_oneri_mi(*metinler):
+    """Metin dışarıdan gelen bir öneriden ya da ondan Ghost'un yazdığı taslaktan mı? (ghost_oneri.ogrenme_disi; modül yoksa False)"""
+    for m in metinler:
+        if isinstance(m, dict) and m.get("dis_oneri"):
+            return True
+    try:
+        import ghost_oneri
+        return ghost_oneri.ogrenme_disi(*metinler)
+    except Exception:  # noqa: BLE001
+        return False
+
+
 HAVUZ = KLASOR / "profil" / "ornek_havuzu.json"
 
 
@@ -143,6 +196,8 @@ def havuz():
 def havuza_ekle(taslak):
     """ONAYLI örnek: yalnızca kullanıcı 'Evet, paylaştım' dediğinde (kopyalamak, sessiz kalmak ya da taslak beğenilmiş sayılmaz). Bağlamıyla saklanır:
     tür (taraftar, ironi, haber...), platform, alan, kaynak, düzeltilip düzeltilmediği; 'neden' isteğe bağlı (kullanıcı tek dokunuşla ekler)."""
+    if _dis_oneri_mi(taslak):          # gelen öneriden çıkan metin kendiliğinden öğrenmeye girmez (2026-10-31, ghost_oneri.py)
+        return
     L = [x for x in havuz() if x.get("metin") != taslak.get("metin")]
     L.append({"metin": str(taslak.get("metin") or "")[:2000], "platform": taslak.get("platform") or "x",
               "tur": taslak.get("karisim_tur") or taslak.get("bicim") or "", "alan": taslak.get("alan") or "", "konu": str(taslak.get("konu") or "")[:200],
@@ -190,6 +245,8 @@ def _red(pr, tur):
 
 def ogren(tur, kayit):
     """Geri bildirim: 'paylasilan' (kullanıcının paylaştığı son metin; en güçlü örnek) ya da 'reddedilen' ({konu, ilk, neden})."""
+    if tur == "paylasilan" and _dis_oneri_mi(kayit):   # gelen öneriden çıkan metin ses örneği olmaz (ghost_oneri.py)
+        return
     p = profil()
     L = [x for x in p[tur] if x != kayit] + [kayit]
     profil_kaydet(**{tur: L[-30:]})
@@ -197,6 +254,8 @@ def ogren(tur, kayit):
 
 def begeni(taslak, var=True):
     """Elden geçirirken 'Kalsın' (2026-10-27): zayıf olumlu sinyal; aynı metin bir kez, geri alınınca silinir (son 30)."""
+    if _dis_oneri_mi(taslak):          # gelen öneriden çıkan metin kendiliğinden öğrenmeye girmez (2026-10-31, ghost_oneri.py)
+        return
     m = str(taslak.get("metin") or "")[:900]
     L = [x for x in profil().get("begenilen") or [] if isinstance(x, dict) and x.get("metin") != m]
     if var:
@@ -637,6 +696,8 @@ def _gorus_yaz(yeni, log=print):
 
 def gorus_ekle_paylasimdan(metin):
     """Paylaştığı bir gönderiden yeni görüşleri deftere ekler (sonnet; 0-2 görüş)."""
+    if _dis_oneri_mi(metin):          # gelen öneriden çıkan metin kendiliğinden öğrenmeye girmez (2026-10-31, ghost_oneri.py)
+        return
     c = _claude_json("Aşağıdaki gönderide yazarın AÇIKÇA savunduğu görüş varsa çıkar (en çok 2; yoksa boş). Her biri: konu (2-5 kelime), gorus (tek cümle, "
                      "onun sözüne sadık; genel ilke ya da öğüt EKLEME), alan, kanit (gönderiden HARFİ HARFİNE alıntı).\n"
                      'JSON: {"gorusler": []}\n\nGÖNDERİ:\n' + str(metin)[:2000], model_adi="sonnet")
@@ -719,9 +780,12 @@ def _gorus_blogu(konu):
 
 # ---------------------------------------------------------------- dayanak kuralı: her taslak kişinin bir şeyine dayanmalı
 def dayanak_belirle(veri, k, metin):
-    """'kendi' (kişinin deneyimi/fikri), 'gorus' (defterdeki bir görüşüne dayanıyor) ya da '' (dayanaksız → soru sorulur)."""
+    """'kendi' (kişinin deneyimi/fikri), 'gorus' (defterdeki bir görüşüne dayanıyor) ya da '' (dayanaksız → soru sorulur).
+    Dışarıdan gelen öneri ya da seçki, kişinin görüşüne benziyor diye onun görüşü sayılmaz; kişinin kendi karşılığı istenir."""
     if veri.get("kaynak_tur") == "fikir" or str(veri.get("deneyim") or "").strip():
         return "kendi", ""
+    if veri.get("kaynak_tur") in ("dis_oneri", "secki"):
+        return "", ""
     G = ilgili_gorusler(f"{k.get('baglam', '')} {k.get('gorus', '')} {metin}", 1)
     if G and len(_kokler(metin) & _kokler(G[0].get("konu", "") + " " + G[0].get("gorus", ""))) >= 3:
         return "gorus", f"{G[0].get('konu')}: {G[0].get('gorus')}"
@@ -1183,7 +1247,10 @@ def uret(json_yolu, log=print, en_cok=3):
     kaynak_ad = {"yazi": "bir yazının metni", "yazi_link": "bir yazının metni", "video": "bir videonun özeti ve transkripti",
                  "secki": "bir araştırma notu (kaynakları ve kanıt sınırıyla; ChatGPT'nin günlük okuma seçkisinden) ve varsa kişinin bu konudaki KENDİ "
                           "karşılığı. Kendi karşılığı verildiyse yalnızca onun etrafında TEK konu seç; gönderinin merkezi o gözlem olur, araştırma "
-                          "notu dayanak olarak kalır. Kanıt sınırının ötesine geçen iddia seçme"}.get(tur, "bir videonun özeti ve transkripti")
+                          "notu dayanak olarak kalır. Kanıt sınırının ötesine geçen iddia seçme",
+                 "dis_oneri": "dışarıdan bir yazı asistanının (ör. ChatGPT) önerdiği bir gönderi fikri, araştırma notu ve kaynağı. Bu KİŞİNİN SÖZÜ DEĞİL; "
+                              "onaylanmış ya da seçilmiş de değil. Önerinin cümlelerini kopyalama; fikri ve kaynağı al, Ghost'un açısıyla kişinin sesinde "
+                              "baştan yaz. Kanıt sınırının ötesine geçme. EDİTÖR NOTU kişinin görüşü değildir, ona görüş diye atfetme; yalnız KAYNAKLI OLGULAR olgudur"}.get(tur, "bir videonun özeti ve transkripti")
     kendi_deneyim = tur == "fikir" or bool(str(veri.get("deneyim") or "").strip())
     platform = veri.get("platform") if veri.get("platform") in ("x", "linkedin") else "x"
     if tur == "taslak":                      # kişinin kendi taslağı + düzenleme isteği: konu seçimi, açı, okur döngüsü yok; yalnız istenen değişiklik
@@ -1498,6 +1565,8 @@ def duzeltme_ogren(once, sonra, is_turu=None, kanit="duzenledi"):
     """Kullanıcı taslağı düzeltip paylaştı: çift saklanır; 3 yeni çift birikince Claude kalıpları 'düzeltme dersleri'ne çevirir (≤8 madde).
     25 Ekim (ChatGPT değerlendirmesi): her ders KAPSAMIYLA (hangi metin işi/ilişki için) ve kanıt türüyle saklanır; tek örnekten genel kural çıkarılmaz,
     kişinin söylemediği gerekçe onun söylediği gibi yazılmaz."""
+    if _dis_oneri_mi(once, sonra):          # gelen öneriden çıkan metin kendiliğinden öğrenmeye girmez (2026-10-31, ghost_oneri.py)
+        return
     once, sonra = str(once or "").strip(), str(sonra or "").strip()
     if not once or not sonra or once == sonra:
         return

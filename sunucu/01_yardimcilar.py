@@ -12,7 +12,42 @@ def _env():
     return env
 
 
-def _bildir(baslik, metin, url=""):
+# bildirimin hangi ürünün ziline düşeceği: adresteki kapı, yoksa çağıran parça (2026-11-02)
+_BILDIRIM_PARCA = {"note": ("04_", "09_meet", "16_meet", "20_", "25_", "27_", "28_", "29_", "30_", "33_kayit", "35_", "37_"),
+                   "transcript": ("02_", "03_", "06_", "14_", "18_", "21_", "39_"), "atolye": ("09_atolye", "15_")}
+
+
+def _bildirim_urunu(url, dosya):
+    try:
+        k = URUN_PORTLARI.get(urllib.parse.urlparse(url).port)
+        if k:
+            return k
+    except (NameError, ValueError):
+        pass
+    ad = Path(dosya).name
+    if "ghost" in ad:
+        return "ghost"
+    return next((u for u, B in _BILDIRIM_PARCA.items() if ad.startswith(B)), "genel")
+
+
+def _urun_adresi(urun, temel=""):
+    """O ürünün bu Mac'teki adresi; temel verilirse o kaydı açar."""
+    p = next((p for p, k in URUN_PORTLARI.items() if k == urun and p != 8770), None)
+    return f"http://127.0.0.1:{p}/" + (f"#t={urllib.parse.quote(temel)}" if temel else "") if p else ""
+
+
+def _bildir(baslik, metin, url="", urun=""):
+    """Mac bildirimi gösterir ve zilin geçmişine yazar (urun boşsa adresten ya da çağıran parçadan bulunur)."""
+    try:
+        import bildirimler
+        u = urun or _bildirim_urunu(url, sys._getframe(1).f_code.co_filename)
+        bildirimler.kaydet(baslik, metin, u, url or _urun_adresi(u))
+    except Exception:  # noqa: BLE001
+        pass
+    _bildirim_goster(baslik, metin, url)
+
+
+def _bildirim_goster(baslik, metin, url=""):
     """macOS bildirimi (sessizce başarısız olabilir). url verilirse ve kaydedici bildirim gösterebiliyorsa (kayitlar/.bildirim/.destek), bildirime
     tıklayınca o sayfa açılır (2026-10-24; osascript bildirimi tıklanınca Komut Dosyası Düzenleyicisi'ni açıyordu). 20 sn içinde gösterilmezse eski yol."""
     kl = KAYIT / ".bildirim"
@@ -24,7 +59,7 @@ def _bildir(baslik, metin, url=""):
             def _yedek():
                 time.sleep(20)
                 if f.exists():
-                    f.unlink(missing_ok=True); _bildir(baslik, metin)
+                    f.unlink(missing_ok=True); _bildirim_goster(baslik, metin)
             threading.Thread(target=_yedek, daemon=True).start()
             return
     except Exception:  # noqa: BLE001
@@ -124,6 +159,19 @@ def _ozet_dili(ay=None):
     return "en" if ay.get("dil") == "en" and od == "tr" else od
 
 
+def _alt_surec_var():
+    try:
+        return subprocess.run(["pgrep", "-P", str(os.getpid())], capture_output=True, timeout=5).returncode == 0
+    except Exception:  # noqa: BLE001
+        return True
+
+
+def _yalniz_butcede():
+    """Arka plan çağrısı Claude dengeleyicisinde sıra bekliyor ve sitenin çalışan hiçbir alt süreci yok mu?"""
+    import claude_yaz
+    return bool(claude_yaz.butce_bekleyen()) and not _alt_surec_var()
+
+
 def mesgul_nedenler():
     """Yeniden başlatmayı bekletmesi gereken süren işler (boş liste = güvenli)."""
     n = []
@@ -140,17 +188,20 @@ def mesgul_nedenler():
         n.append("haftalık özet hazırlanıyor")
     if globals().get("toplanti_bitiren"):
         n.append("toplantı sonrası adımlar sürüyor")
-    if globals().get("ghost_defter_durum", {}).get("calisiyor"):
-        n.append("Ghost defteri hazırlanıyor")
-    if globals().get("kesif_durum", {}).get("calisiyor"):
-        n.append("Ghost keşfi sürüyor")
-    if globals().get("blog_durum", {}).get("calisiyor"):
-        n.append("Ghost blog konuları hazırlanıyor")
+    # Ghost'un arka plan işleri bütçe sırasında beklerken (Claude dolu, 2 saate kadar) bir şey yapmıyor; yeniden başlatmayı tutmazlar (2 Kasım: Legal'in yeni
+    # kodu 3 saat devreye giremedi, kullanıcı 405 gördü). Bir sonraki turda baştan çalışırlar.
+    if not _yalniz_butcede():
+        if globals().get("ghost_defter_durum", {}).get("calisiyor"):
+            n.append("Ghost defteri hazırlanıyor")
+        if globals().get("kesif_durum", {}).get("calisiyor"):
+            n.append("Ghost keşfi sürüyor")
+        if globals().get("blog_durum", {}).get("calisiyor"):
+            n.append("Ghost blog konuları hazırlanıyor")
     if any(x.get("calisiyor") for x in list(globals().get("atolye_durum", {}).values())):
         n.append("atölye çalışması sürüyor")
     if ozet_calisan or klip_calisan:
         n.append("özet ya da öne çıkan anlar hazırlanıyor")
-    for _m in ("content_site", "couple_site", "pt_site"):
+    for _m in ("content_site", "couple_site", "pt_site", "capital_site", "office_site"):
         if _m in globals():
             n += globals()[_m].mesgul()
     n += [f"Ghost: {ad}" for ad, d in globals().get("ghost_gelisim_durum", {}).items() if d.get("calisiyor")]
@@ -219,6 +270,8 @@ def _hata_metni(kayit):
         return "Bu video kopya korumalı; sesi alınamıyor. Bu tür videolar yazıya dökülemez."
     if "giriş istiyor" in k or "login required" in k or "sign in" in k or "cookies" in k or "rate-limit" in k:
         return "Bu site giriş istiyor. Tarayıcınızdaki oturumla tekrar deneyin."
+    if "no video" in k or "there is no video in this post" in k:
+        return "Bu gönderide video yok. Linki yeniden yapıştırın; görsel olarak alabilirim."
     if "not a bot" in k or "please update" in k or "yt-dlp -u" in k or "update to the latest" in k:
         return "Video sitesi yöntem değiştirmiş; indirme aracının güncellenmesi gerekiyor."
     if "bulunamadı ya da gizli" in k or "private video" in k or "404" in k or "not available" in k:
@@ -233,3 +286,17 @@ def _hata_metni(kayit):
     return "Bir şeyler ters gitti. Ayrıntılı kayıtta sebebi görebilirsiniz."
 
 
+@app.get("/api/bildirimler")
+def bildirim_listesi():
+    import bildirimler
+    urun = request.args.get("urun", "")[:20]
+    if request.args.get("yalniz_sayi"):
+        return jsonify({"okunmamis": bildirimler.okunmamis(urun)})
+    return jsonify({"liste": bildirimler.liste(urun), "okunmamis": bildirimler.okunmamis(urun) if urun else 0})
+
+
+@app.post("/api/bildirimler/okundu")
+def bildirim_okundu():
+    import bildirimler
+    bildirimler.okundu(str((request.get_json(silent=True) or {}).get("urun") or "")[:20])
+    return jsonify({"ok": True})

@@ -899,7 +899,7 @@ def paragrafla(segmentler, etiket, max_bosluk=2.0, max_uzunluk=600):
         ad = etiket[s["k"]]
         if (paragraflar and paragraflar[-1]["ad"] == ad
                 and s["bas"] - paragraflar[-1]["bit"] <= max_bosluk
-                and len(paragraflar[-1]["metin"]) + len(s["metin"]) <= max_uzunluk):
+                and len(paragraflar[-1]["metin"]) + len(s["metin"]) <= max_uzunluk and not s.get("ayri")):
             paragraflar[-1]["metin"] += " " + s["metin"]
             paragraflar[-1]["bit"] = s["bit"]
             paragraflar[-1]["si"].append(i)
@@ -1574,6 +1574,9 @@ def bekleyenleri_yaz(temel=None):
 def ciktilari_yaz(temel_yol, veri, segmentler):
     """txt + json hemen; docx + srt (+senaryo) hemen ya da ERTELE_SN sonra (toplantılar hep hemen: Drive kopyası docx'i bekler).
     isimlendir.py ve site de bunu kullanır."""
+    if veri.get("yazi"):                                     # sayfadan alınan yazı: başlıklı, görselli kendi belgeleri (icerik.py)
+        import icerik
+        return icerik.ciktilari_yaz(temel_yol, veri, segmentler)
     paragraflar = paragrafla(segmentler, veri["etiket"])
     yaz_txt(str(temel_yol) + ".txt", veri, paragraflar)
     import kayit_json                                        # 2026-10-25: süreçler arası kilit + geçici dosya + girintisiz JSON

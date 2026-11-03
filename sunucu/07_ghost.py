@@ -30,6 +30,12 @@ def x_profil_post():
         # '---' hiç yoksa (eski alışkanlık) boş satırla bölünür.
         ayrac = r"(?m)^\s*---+\s*$" if re.search(r"(?m)^\s*---+\s*$", ornekler) else r"\n\s*\n"
         ornekler = [o.strip() for o in re.split(ayrac, ornekler) if o.strip()]
+    # eski sekmedeki form yeni metni ezmesin: istemci yüklediği hali de gönderir; o sırada değiştiyse yazılmaz
+    pr = paylasim_modulu.profil()
+    if isinstance(v.get("tarz"), str) and "eski_tarz" in v and str(v["eski_tarz"]).strip() != pr["tarz"].strip():
+        return jsonify({"hata": "Tarzınız başka yerde değişmiş; sayfayı yenileyip yeniden bakın.", "guncel": pr["tarz"]}), 409
+    if ornekler is not None and "eski_ornekler" in v and [str(o).strip() for o in v["eski_ornekler"] or []] != pr["ornekler"]:
+        return jsonify({"hata": "Örnekleriniz başka yerde değişmiş; sayfayı yenileyip yeniden bakın."}), 409
     return jsonify(paylasim_modulu.profil_kaydet(tarz=v.get("tarz"), ornekler=ornekler, takip_otomatik=v.get("takip_otomatik"),
                                                  her_video=v.get("her_video")))
 
@@ -72,7 +78,7 @@ def _paylasim_verisi_onbellekli():
 def _paylasim_verisi():
     import difflib
     import kitaplik_onbellek
-    out, elenen, kaldirilan = [], [], []
+    out, elenen, kaldirilan, arsivdekiler = [], [], [], []
     kal = {"onerilen": 0, "paylasilan": 0, "kaldirilan": 0, "nedenler": {}, "duzeltme": [], "dayanakli_paylasilan": 0, "dayanakli": 0}
     sinir = time.time() - 30 * 86400
     for kayit in kitaplik_onbellek.hepsi(ghost=True):       # mtime önbellekli; segmentler ayrıştırılmaz
@@ -109,6 +115,10 @@ def _paylasim_verisi():
                 kaldirilan.append({"temel": ("ghost__" + js.stem) if js.parent.name == "ghost" else js.stem, "i": i, "metin": t.get("metin") or "", "alan": t.get("alan") or "",
                                    "neden": t.get("red_nedeni") or "", "platform": t.get("platform") or "x", "paylas_link": t.get("paylas_link") or "",
                                    "gun": gun_})
+            if t.get("arsiv") and not t.get("gizli") and not t.get("paylasildi"):   # 1 Kasım: gündemi geçmiş öneri (ghost_arsiv.py); ret değil, ayrı listede
+                arsivdekiler.append({**t, "i": i, "temel": ("ghost__" + js.stem) if js.parent.name == "ghost" else js.stem, "baslik": veri.get("baslik") or js.stem,
+                                     "kaynak_tur": veri.get("kaynak_tur") or "video", "olusma": olusma, "gun": gun_, "paylasildi": False})
+                continue
             if not t.get("gizli"):
                 temel = ("ghost__" + js.stem) if js.parent.name == "ghost" else js.stem
                 if "paylas_link" not in t and str(veri.get("link") or "").startswith("http"):     # eski taslaklar: kaynak bağlantısı gönderiyle paylaşılır
@@ -186,7 +196,8 @@ def _paylasim_verisi():
     bugun0 = time.mktime(time.localtime()[:3] + (0, 0, 0, 0, 0, -1))
     ozet["bugun_paylasilan"] = sum(1 for t in paylasilan if (t.get("paylasim_zaman") or 0) >= bugun0)
     # gün gün gezinmek için 30 günün tamamı (eskiden 60/20 ile kesiliyordu; geçmiş günler boş görünürdü)
-    return {"taslaklar": out[:300], "paylasilan": paylasilan[:200], "hazirlanan": hazirlanan, "ozet": ozet, "elenen": elenen[:20], "kaldirilanlar": kaldirilan[-400:]}
+    return {"taslaklar": out[:300], "paylasilan": paylasilan[:200], "hazirlanan": hazirlanan, "ozet": ozet, "elenen": elenen[:20], "kaldirilanlar": kaldirilan[-400:],
+            "arsiv": sorted(arsivdekiler, key=lambda t: -(t.get("olusma") or 0))[:200]}
 
 
 kesif_durum = {"calisiyor": False, "hata": "", "log": []}
@@ -1091,6 +1102,9 @@ def ghost_yaz():
                 return jsonify({"hata": j["hata"]}), 400
             return jsonify({"tamam": True, "tur": "video"})
     else:
+        if tur in ("fikir", "yazi") and paylasim_modulu._dis_oneri_mi(girdi):   # kayıtlı bir dış öneri kutuya yapıştırıldıysa kişinin fikri sayılmaz, deftere girmez
+            import ghost_oneri as _go
+            return jsonify({"tamam": True, "tur": "dis_oneri", "oneri": _go.ekle(girdi)[0]["id"]})
         baslik, metin, link = "", girdi, ""
         if tur == "yazi_link":
             try:
@@ -1152,6 +1166,14 @@ def paylasim_isaretle(temel, i):
             if L[i].get("duzenlendi") and not v.get("paylasildi"):
                 an = f"{temel}#{i}"; _duzeltme_zaman[an] = time.time()
                 threading.Thread(target=_duzeltmeden_ogren_sonra, args=(yol, i, an), daemon=True).start()
+        if "arsiv" in v:                               # 1 Kasım: arşivden geri getir {arsiv: false} ya da elle arşivle {arsiv: true}; öğrenme yok
+            if v["arsiv"]:
+                L[i].update(arsiv=True, arsiv_zaman=time.time(), arsiv_neden="elle arşivlendi")
+            else:
+                L[i]["arsiv"] = False; L[i]["arsiv_geri"] = time.time()
+            yol.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+            _paylasim_memo["v"] = None
+            return jsonify({"tamam": True})
         for an in ("gizli", "paylasildi"):
             if an in v:
                 L[i][an] = bool(v[an])
@@ -1416,8 +1438,19 @@ def _ghost_zaman_dongu():
         time.sleep(60)
         if not _ghost_kurulu():                            # ilk açılış kurulumu yapılmadan keşif ve hatırlatma yok (2026-10-29)
             continue
-        try:                                               # Ghost keşfi: 07.30 ve 14.00'ten sonra birer kez (kaynak tarama + taslaklar)
+        try:                                               # Ghost keşfi: günde bir (07.30 sonrası); öğle turu ayar ghost_ogle_turu ile
             zt = time.localtime(); dilim = "ogle" if zt.tm_hour >= 14 else ("sabah" if (zt.tm_hour, zt.tm_min) >= (7, 30) else "")
+            if dilim == "ogle" and not ayarlar_oku().get("ghost_ogle_turu", False):
+                dilim = "sabah"                            # 1 Kasım (kullanıcı: "günde bir kere güncellensin"): öğle turu kapalı; sabah turu kaçtıysa öğleden sonra bir kez
+            arsiv_isaret = KAYIT / ".ghost_arsiv_gun"     # 1 Kasım: gündemi geçmiş öneriler günde bir, yeni tur yazılmadan önce arşive
+            if dilim and (not arsiv_isaret.exists() or arsiv_isaret.read_text(encoding="utf-8") != time.strftime("%Y-%m-%d")):
+                arsiv_isaret.write_text(time.strftime("%Y-%m-%d"), encoding="utf-8")
+                try:
+                    import ghost_arsiv
+                    ghost_arsiv.arsivle(log=lambda m: print(m, flush=True))
+                    _paylasim_memo["v"] = None
+                except Exception as e:  # noqa: BLE001
+                    print(f"Ghost arşivleme hatası: {e}", flush=True)
             isaret = KAYIT / ".kesif_son"; anahtar = time.strftime("%Y-%m-%d") + ":" + dilim
             if dilim and ayarlar_oku().get("ghost_kesif", True) and (not isaret.exists() or isaret.read_text(encoding="utf-8") != anahtar):
                 import claude_yaz
